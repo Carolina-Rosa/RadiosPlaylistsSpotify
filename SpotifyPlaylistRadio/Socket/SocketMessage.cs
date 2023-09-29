@@ -47,7 +47,7 @@ namespace SpotifyPlaylistRadio.Socket
         {
             var buffer = Encoding.UTF8.GetBytes(data);
             var segment = new ArraySegment<byte>(buffer);
-            //await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+            await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
 }
