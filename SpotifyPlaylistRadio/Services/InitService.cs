@@ -41,8 +41,6 @@ namespace SpotifyPlaylistRadio.Services
                     _configuration.GetSection("Playlist:DefaultSize").Get<int>() :
                     _configuration.GetSection("Playlist:MaxSize").Get<int>();
 
-            var lastMusicPlayed = "";
-
             CancellationToken ct = context.RequestAborted;
             string currentSubscriberId;
 
@@ -55,6 +53,9 @@ namespace SpotifyPlaylistRadio.Services
             List<Radio> radiosList = _configuration.GetSection("Radios").Get<List<Radio>>();
 
             DateTime lastRefresh = DateTime.Now;
+
+
+            var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: x => x.name, elementSelector: x => "");
 
             while (true)
             {
@@ -88,9 +89,9 @@ namespace SpotifyPlaylistRadio.Services
 
                             //SongScraped scrapedSong = new() { Title = "Tightrope", Artist = "Janelle Monáe c/ Big Boi" };
 
-                            if (scrapedSong.Title != lastMusicPlayed)
+                            if (scrapedSong.Title != lastMusicPlayedOnRadio[r.name])
                             {
-                                lastMusicPlayed = scrapedSong.Title;
+                                lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
 
                                 if (scrapedSong.Title != "" && scrapedSong.Artist != "" && !r.Podcasts.Contains(scrapedSong.Title))
                                 {
@@ -101,7 +102,7 @@ namespace SpotifyPlaylistRadio.Services
                                         music.radioName = r.name;
                                         music.timestamp = DateTime.UtcNow;
                                         await _musicSpotifyService.CreateAsync(music);
-                                        foreach(Artist a in music.artists)
+                                        foreach (Artist a in music.artists)
                                         {
                                             a.radioName = r.name;
                                             a.timestamp = DateTime.UtcNow;
