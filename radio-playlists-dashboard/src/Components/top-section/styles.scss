@@ -1,0 +1,11 @@
+@import "./../../utilities/variables.scss";
+
+.top-section {
+    h1 {
+        color: $secondary-color;
+        font-size: 30px;
+        margin: 30px 0;
+        text-transform: uppercase;
+        text-align: center;
+    }
+}

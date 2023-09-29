@@ -1,0 +1,27 @@
+@import "./../../utilities/variables.scss";
+
+.top-item-container {
+    margin-right: 50px;
+    width: 300px;
+    height: 160px;
+    h1 {
+        margin: 0;
+        font-size: 40px;
+        color: $secondary-color;
+    }
+    p {
+        margin: 0;
+        color: $white;
+        font-size: 20px;
+
+        &.times-played {
+            font-size: 25px;
+            color: $secondary-color;
+        }
+    }
+    h2 {
+        font-size: 25px;
+        margin-bottom: 0;
+        color: $white;
+    }
+}

@@ -1,0 +1,24 @@
+@import "./../../utilities/variables.scss";
+
+.header {
+    background: linear-gradient(180deg, $base-color, $background-color);
+    padding: 6vh;
+    display: flex;
+    justify-content: space-between;
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        float: right;
+        li {
+            display: inline;
+            display: inline-block;
+            padding-left: 80px;
+            font-size: 25px;
+            a {
+                text-decoration: none;
+                color: $secondary-color;
+            }
+        }
+    }
+}

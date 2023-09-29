@@ -1,0 +1,19 @@
+@import "./../../utilities/variables.scss";
+
+.top-5 {
+    h1 {
+        margin: 0;
+        font-size: 25px;
+        color: $primary-color;
+        text-align: start;
+    }
+    .tops-section {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 50px;
+        height: max-content;
+        padding: 10px 30px 30px 30px;
+        background-color: $base-color;
+        border-radius: 30px;
+    }
+}

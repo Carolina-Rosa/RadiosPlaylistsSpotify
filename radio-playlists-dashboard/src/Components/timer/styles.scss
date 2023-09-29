@@ -1,0 +1,34 @@
+@import "./../../utilities/variables.scss";
+
+.countdown-wrapper {
+    display: flex;
+
+    .countdown-item {
+        color: $white;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        line-height: 30px;
+        margin: 10px;
+        padding-top: 10px;
+        position: relative;
+        width: 100px;
+        height: 100px;
+
+        span {
+            color: $secondary-color;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .countdown-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+        }
+    }
+}

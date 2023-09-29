@@ -1,0 +1,26 @@
+@import "./../../utilities/variables.scss";
+
+.dashboard-page {
+    min-height: 85vh;
+    display: flex;
+    background-color: $background-color;
+    padding: 0 150px;
+    justify-content: space-around;
+    align-items: stretch;
+    align-content: stretch;
+
+    .left-section {
+        width: 70%;
+
+        .logs-title {
+            color: $secondary-color;
+            font-size: 70px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+    }
+
+    .right-section {
+        width: 20%;
+    }
+}

@@ -1,0 +1,54 @@
+@import "./../../utilities/variables.scss";
+
+.stats-page {
+    display: flex;
+    flex-direction: column;
+    background-color: $background-color;
+    min-height: 85vh;
+    padding: 0 150px 100px;
+    .stats-title {
+        color: $secondary-color;
+        font-size: 70px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+    .stats-subtitle {
+        color: $primary-color;
+        font-size: 30px;
+        margin-bottom: 50px;
+    }
+
+    .selected-tab {
+        background-color: $primary-color-with-alpha;
+        font-weight: 700;
+        border-radius: 20px;
+        color: $background-color;
+        height: 50px;
+        margin: 0;
+        vertical-align: middle;
+    }
+
+    .tabs-list {
+        background-color: $secondary-color;
+        border-radius: 20px;
+        height: 50px;
+        width: 100%;
+        color: $background-color;
+        font-size: 25px;
+        display: inline-grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        flex-direction: row;
+        justify-content: space-between;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        li {
+            vertical-align: middle;
+            text-align: center;
+            display: inline-block;
+            cursor: pointer;
+            height: 50px;
+            align-self: center;
+        }
+    }
+}

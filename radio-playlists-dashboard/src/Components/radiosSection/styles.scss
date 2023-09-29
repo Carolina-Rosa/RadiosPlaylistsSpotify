@@ -1,0 +1,28 @@
+@import "./../../utilities/variables.scss";
+
+.radio-section {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+    .add-radio-button {
+        margin: 25px 5px;
+        cursor: pointer;
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: $secondary-color;
+        }
+
+        &:hover {
+            font-weight: 700;
+            background-color: $primary-color;
+            border-radius: 20px;
+            padding: 10px 20px;
+            p {
+                color: $background-color;
+            }
+        }
+    }
+}
