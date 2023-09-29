@@ -59,30 +59,30 @@ internal class Program
 
         app.UseCors("ClientPermission");
 
-        //var webSocketOptions = new WebSocketOptions
-        //{
-        //    KeepAliveInterval = TimeSpan.FromMinutes(2)
-        //};
+        var webSocketOptions = new WebSocketOptions
+        {
+            KeepAliveInterval = TimeSpan.FromMinutes(2)
+        };
 
-        //app.UseWebSockets(webSocketOptions);
+        app.UseWebSockets(webSocketOptions);
 
-        //app.Run(async (context) =>
-        //{
-        //    if (context.WebSockets.IsWebSocketRequest)
-        //    {
-        //        WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+        app.Run(async (context) =>
+        {
+            if (context.WebSockets.IsWebSocketRequest)
+            {
+                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
-        //        using (var serviceScope = app.Services.CreateScope())
-        //        {
-        //            var services = serviceScope.ServiceProvider;
+                using (var serviceScope = app.Services.CreateScope())
+                {
+                    var services = serviceScope.ServiceProvider;
 
-        //            var init = services.GetRequiredService<IInitService>();
+                    var init = services.GetRequiredService<IInitService>();
 
-        //            Use the service
-        //            await init.something(context/*, webSocket*/);
-        //        }
-        //    }
-        //});
+                    //Use the service
+                    await init.something(context, webSocket);
+                }
+            }
+        });
 
         app.UseRouting();
 

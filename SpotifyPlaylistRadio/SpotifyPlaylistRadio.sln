@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Antena3ToSpotifyPlaylistTes
 		{47679E19-67AC-4CAB-AB1E-056C66EB7561} = {47679E19-67AC-4CAB-AB1E-056C66EB7561}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "websocketclientradios", "..\websocketclientradios\websocketclientradios.csproj", "{CFD61143-C3ED-4681-A8FF-CCEF111C19EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "websocketclientradios", "..\..\websocketclientradios\websocketclientradios.csproj", "{CFD61143-C3ED-4681-A8FF-CCEF111C19EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

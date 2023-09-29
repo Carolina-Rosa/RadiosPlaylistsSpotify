@@ -30,7 +30,7 @@ namespace SpotifyPlaylistRadio.Services
             _artistsService = artistsService;
         }
 
-        public async Task something(HttpContext context/*, WebSocket ws*/)
+        public async Task something(HttpContext context, WebSocket ws)
         {
             int MAX_MAX_SIZE = 9000;
             int MIN_SIZE = 10;
@@ -46,7 +46,7 @@ namespace SpotifyPlaylistRadio.Services
             CancellationToken ct = context.RequestAborted;
             string currentSubscriberId;
 
-            //currentSubscriberId = _socketMessages.AddSubscriber(ws);
+            currentSubscriberId = _socketMessages.AddSubscriber(ws);
 
             await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Connected", TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = "None" }));
 
@@ -135,15 +135,15 @@ namespace SpotifyPlaylistRadio.Services
                 }
             }
 
-            //if (!string.IsNullOrWhiteSpace(currentSubscriberId))
-            //{
-            //    _socketMessages.RemoveSubscriber(currentSubscriberId);
-            //    if (ws != null)
-            //    {
-            //        await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-            //        ws.Dispose();
-            //    }
-            //}
+            if (!string.IsNullOrWhiteSpace(currentSubscriberId))
+            {
+                _socketMessages.RemoveSubscriber(currentSubscriberId);
+                if (ws != null)
+                {
+                    await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                    ws.Dispose();
+                }
+            }
 
             return;
         }
@@ -163,7 +163,7 @@ namespace SpotifyPlaylistRadio.Services
                                         { "description", "Automatically updated playlist from what is playing in "+selectedRadio },
                                         { "public", "true" }
                                     });
-                await _playlistService.CreateAsync(p);
+                //await _playlistService.CreateAsync(p);
 
                 return p;
             }
