@@ -41,12 +41,13 @@ namespace SpotifyPlaylistRadio.Controllers
         [HttpGet("top5")]
         public async Task<List<TopSongsByRadio>> GetTop5Songs()
         {
+            const string TOP5_SONGS_GLOBAL = "GLOBAL";
+
             var radios = await _radiosService.GetAsync();
 
             var allTop5Songs = new List<TopSongsByRadio>();
 
-
-            var top5Songs = await _musicSpotifyService.GetTop5SongsAsync("ALL");
+            var top5Songs = await _musicSpotifyService.GetTop5SongsAsync(TimeRange.FromStart, TOP5_SONGS_GLOBAL);
             allTop5Songs.Add(new TopSongsByRadio
             {
                 TopType = "Global",
@@ -55,7 +56,36 @@ namespace SpotifyPlaylistRadio.Controllers
 
             foreach (var radio in radios)
             {
-                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(radio.name);
+                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(TimeRange.FromStart, radio.name);
+                allTop5Songs.Add(new TopSongsByRadio
+                {
+                    TopType = radio.name,
+                    TopSongs = top5Songs
+                });
+            }
+
+            return allTop5Songs;
+        }
+        
+        [HttpGet("top5/{timeRange}")]
+        public async Task<List<TopSongsByRadio>> GetTop5SongsByTimeRange(TimeRange timeRange = TimeRange.FromStart)
+        {
+            const string TOP5_SONGS_GLOBAL = "GLOBAL";
+
+            var radios = await _radiosService.GetAsync();
+
+            var allTop5Songs = new List<TopSongsByRadio>();
+
+            var top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, TOP5_SONGS_GLOBAL);
+            allTop5Songs.Add(new TopSongsByRadio
+            {
+                TopType = "Global",
+                TopSongs = top5Songs
+            });
+
+            foreach (var radio in radios)
+            {
+                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, radio.name);
                 allTop5Songs.Add(new TopSongsByRadio
                 {
                     TopType = radio.name,
