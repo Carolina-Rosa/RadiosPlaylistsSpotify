@@ -18,7 +18,7 @@ export default function TopItem({ itemNo, timesPlayed, songName, songArtist }) {
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
         >
-            <h1>#{itemNo}</h1>
+            <h1 className="position-number">#{itemNo}</h1>
             {isHovering ? (
                 <p className="times-played">{timesPlayed}x</p>
             ) : (
