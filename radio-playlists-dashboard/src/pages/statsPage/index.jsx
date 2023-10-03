@@ -7,8 +7,20 @@ import TopSection from "../../Components/top-section";
 import "./styles.scss";
 
 export default function StatsPage() {
+    const TimeRange = {
+        Last24Hours: {
+            displayName: "Last 24 hours",
+            name: "Last24Hours",
+            id: 0
+        },
+        Last7Days: { displayName: "Last 7 days", name: "Last7Days", id: 1 },
+        Last30Days: { displayName: "Last 30 days", name: "Last30Days", id: 2 },
+        FromStart: { displayName: "From start", name: "FromStart", id: 3 }
+    };
+
     const [radiosTopArtists, setRadiosTopArtists] = useState([]);
     const [radiosTopSongs, setRadiosTopSongs] = useState([]);
+    const [selectedTab, setSelectedTab] = useState(TimeRange.Last24Hours.id);
 
     useEffect(() => {
         axios.get(`https://localhost:7269/api/artists/top5`).then((res) => {
@@ -16,44 +28,48 @@ export default function StatsPage() {
         });
 
         axios
-            .get(`https://localhost:7269/api/musicSpotify/top5`)
+            .get(`https://localhost:7269/api/musicSpotify/top5/${selectedTab}`)
             .then((res) => {
                 setRadiosTopSongs(res.data);
             });
-    }, []);
+    }, [selectedTab]);
 
     return (
         <div className="stats-page">
             <h1 className="stats-title">Statistics</h1>
             <h2 className="stats-subtitle">Most played songs </h2>
-            <Tabs defaultIndex={0} selectedTabClassName="selected-tab">
+            <Tabs
+                defaultIndex={TimeRange.Last24Hours.id}
+                selectedTabClassName="selected-tab"
+                onSelect={(tabIndex) => setSelectedTab(tabIndex)}
+            >
                 <TabList className="tabs-list">
-                    <Tab>Last 24 hours</Tab>
-                    <Tab>Last 7 days</Tab>
-                    <Tab>Last 30 days</Tab>
-                    <Tab>From start</Tab>
+                    <Tab>{TimeRange.Last24Hours.displayName}</Tab>
+                    <Tab>{TimeRange.Last7Days.displayName}</Tab>
+                    <Tab>{TimeRange.Last30Days.displayName}</Tab>
+                    <Tab>{TimeRange.FromStart.displayName}</Tab>
                 </TabList>
                 <TabPanel>
                     <TopSection
-                        title="Last 24 hours"
+                        title={TimeRange.Last24Hours.displayName}
                         topByRadio={radiosTopSongs}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="Last 7 days"
+                        title={TimeRange.Last7Days.displayName}
                         topByRadio={radiosTopSongs}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="Last 30 days"
+                        title={TimeRange.Last30Days.displayName}
                         topByRadio={radiosTopSongs}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="From start"
+                        title={TimeRange.FromStart.displayName}
                         topByRadio={radiosTopSongs}
                     />
                 </TabPanel>

@@ -4,23 +4,27 @@
     margin-right: 50px;
     width: 300px;
     height: 160px;
-    h1 {
+
+    .position-number {
         margin: 0;
-        font-size: 40px;
         color: $secondary-color;
+        font-size: 40px;
     }
+
     p {
         margin: 0;
         color: $white;
         font-size: 20px;
 
         &.times-played {
-            font-size: 25px;
-            color: $secondary-color;
+            font-size: 70px;
+            color: $primary-color;
+            font-weight: 700;
         }
     }
     h2 {
         font-size: 25px;
+        margin-top: 10px;
         margin-bottom: 0;
         color: $white;
     }
