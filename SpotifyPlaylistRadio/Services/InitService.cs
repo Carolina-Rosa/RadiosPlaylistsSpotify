@@ -107,11 +107,6 @@ namespace SpotifyPlaylistRadio.Services
             return songTitle == lastMusicPlayedOnRadio;
         }
 
-        //private async Task SendMessageSocket(string message, MessageType messageType, string radioName)
-        //{
-        //    await _messageWriter.Write(JsonConvert.SerializeObject(new SendSocketMessage { Message = message, TimeStamp = DateTime.Now, MessageType = messageType, RadioName = radioName }));
-        //}
-
         private async Task<AuthToken> NewRefreshToken()
         {
             return await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);

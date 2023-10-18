@@ -20,7 +20,6 @@ namespace SpotifyPlaylistRadio.Hubs
 
         public async Task SendMessageSocket(string message, MessageType messageType, string radioName)
         {
-            Console.WriteLine(message);
             await Write(JsonConvert.SerializeObject(new SendSocketMessage { Message = message, TimeStamp = DateTime.Now, MessageType = messageType, RadioName = radioName }));
         }
     }
