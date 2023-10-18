@@ -20,19 +20,28 @@ export default function StatsPage() {
 
     const [radiosTopArtists, setRadiosTopArtists] = useState([]);
     const [radiosTopSongs, setRadiosTopSongs] = useState([]);
-    const [selectedTab, setSelectedTab] = useState(TimeRange.Last24Hours.id);
+    const [selectedMusicTab, setSelectedMusicTab] = useState(
+        TimeRange.Last24Hours.id
+    );
+    const [selectedArtistTab, setSelectedArtistTab] = useState(
+        TimeRange.Last24Hours.id
+    );
 
     useEffect(() => {
-        axios.get(`https://localhost:7269/api/artists/top5`).then((res) => {
-            setRadiosTopArtists(res.data);
-        });
+        axios
+            .get(`https://localhost:7269/api/artists/top5/${selectedArtistTab}`)
+            .then((res) => {
+                setRadiosTopArtists(res.data);
+            });
 
         axios
-            .get(`https://localhost:7269/api/musicSpotify/top5/${selectedTab}`)
+            .get(
+                `https://localhost:7269/api/musicSpotify/top5/${selectedMusicTab}`
+            )
             .then((res) => {
                 setRadiosTopSongs(res.data);
             });
-    }, [selectedTab]);
+    }, [selectedArtistTab, selectedMusicTab]);
 
     return (
         <div className="stats-page">
@@ -41,7 +50,7 @@ export default function StatsPage() {
             <Tabs
                 defaultIndex={TimeRange.Last24Hours.id}
                 selectedTabClassName="selected-tab"
-                onSelect={(tabIndex) => setSelectedTab(tabIndex)}
+                onSelect={(tabIndex) => setSelectedMusicTab(tabIndex)}
             >
                 <TabList className="tabs-list">
                     <Tab>{TimeRange.Last24Hours.displayName}</Tab>
@@ -76,34 +85,38 @@ export default function StatsPage() {
             </Tabs>
 
             <h2 className="stats-subtitle">Most played artists </h2>
-            <Tabs defaultIndex={0} selectedTabClassName="selected-tab">
+            <Tabs
+                defaultIndex={TimeRange.Last24Hours.id}
+                selectedTabClassName="selected-tab"
+                onSelect={(tabIndex) => setSelectedArtistTab(tabIndex)}
+            >
                 <TabList className="tabs-list">
-                    <Tab>Last 24 hours</Tab>
-                    <Tab>Last 7 days</Tab>
-                    <Tab>Last 30 days</Tab>
-                    <Tab>From start</Tab>
+                    <Tab>{TimeRange.Last24Hours.displayName}</Tab>
+                    <Tab>{TimeRange.Last7Days.displayName}</Tab>
+                    <Tab>{TimeRange.Last30Days.displayName}</Tab>
+                    <Tab>{TimeRange.FromStart.displayName}</Tab>
                 </TabList>
                 <TabPanel>
                     <TopSection
-                        title="Last 24 hours"
+                        title={TimeRange.Last24Hours.displayName}
                         topByRadio={radiosTopArtists}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="Last 7 days"
+                        title={TimeRange.Last7Days.displayName}
                         topByRadio={radiosTopArtists}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="Last 30 days"
+                        title={TimeRange.Last30Days.displayName}
                         topByRadio={radiosTopArtists}
                     />
                 </TabPanel>
                 <TabPanel>
                     <TopSection
-                        title="From start"
+                        title={TimeRange.FromStart.displayName}
                         topByRadio={radiosTopArtists}
                     />
                 </TabPanel>

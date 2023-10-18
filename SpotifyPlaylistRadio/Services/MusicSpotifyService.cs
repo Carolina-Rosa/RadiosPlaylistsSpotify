@@ -49,8 +49,6 @@ namespace SpotifyPlaylistRadio.Services
             var topValues = songsTimesPlayed.OrderByDescending(x => x.TimesPlayed)
                              .Take(5).ToList();
 
-            Console.WriteLine(topValues);
-
             return topValues;
         }
 

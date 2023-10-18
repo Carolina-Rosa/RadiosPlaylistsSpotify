@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using AngleSharp.Media.Dom;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SpotifyPlaylistRadio.Models;
 using SpotifyPlaylistRadio.Models.Top5;
@@ -29,9 +30,12 @@ namespace SpotifyPlaylistRadio.Services
             await _artistCollection.Find(x => x._id == id).FirstOrDefaultAsync();
 
 
-        public async Task<List<TopArtist>> GetTop5ArtistsAsync(string radio)
+        public async Task<List<TopArtist>> GetTop5ArtistsAsync(TimeRange timeRange, string radio)
         {
-            var allArtists = radio == "ALL" ? await _artistCollection.Find(_ => true).ToListAsync() : await _artistCollection.Find(x => x.radioName == radio).ToListAsync();
+
+            DateTime timeForComparison = getDateTimeRange(timeRange);
+
+            var allArtists = radio == "ALL" ? await _artistCollection.Find(x => x.timestamp > timeForComparison).ToListAsync() : await _artistCollection.Find(x => x.radioName == radio && x.timestamp > timeForComparison).ToListAsync();
 
             List<TopArtist> artistTimesPlayed = new List<TopArtist>();
 
@@ -60,5 +64,21 @@ namespace SpotifyPlaylistRadio.Services
         public async Task RemoveAsync(string id) =>
             await _artistCollection.DeleteOneAsync(x => x._id == id);
 
+        private DateTime getDateTimeRange(TimeRange timeRange)
+        {
+            switch (timeRange)
+            {
+                case TimeRange.Last24Hours:
+                    return DateTime.UtcNow.AddDays(-1);
+                case TimeRange.Last7Days:
+                    return DateTime.UtcNow.AddDays(-7);
+                case TimeRange.Last30Days:
+                    return DateTime.UtcNow.AddDays(-30);
+                case TimeRange.FromStart:
+                    return DateTime.UtcNow.AddYears(-20);
+                default:
+                    return DateTime.UtcNow;
+            }
+        }
     }
 }

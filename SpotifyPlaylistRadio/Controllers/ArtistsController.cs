@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AngleSharp.Media.Dom;
+using Microsoft.AspNetCore.Mvc;
 using SpotifyPlaylistRadio.Models;
 using SpotifyPlaylistRadio.Models.Top5;
 using SpotifyPlaylistRadio.Services;
@@ -38,22 +39,21 @@ namespace SpotifyPlaylistRadio.Controllers
             return artist;
         }
         
-        [HttpGet("top5")]
-        public async Task<List<TopArtistByRadio>> GetTop5Artist()
+        [HttpGet("top5/{timeRange}")]
+        public async Task<List<TopArtistByRadio>> GetTop5Artist(TimeRange timeRange = TimeRange.FromStart)
         {
             var radios = await _radiosService.GetAsync();
 
             var allTop5Artists = new List<TopArtistByRadio>();
-           
 
-            var top5Artists = await _artistService.GetTop5ArtistsAsync("ALL");
+            var top5Artists = await _artistService.GetTop5ArtistsAsync(timeRange, "ALL");
             allTop5Artists.Add(new TopArtistByRadio { 
                 TopType = "Global",
                 TopArtists = top5Artists });
 
             foreach ( var radio in radios)
             {
-                top5Artists = await _artistService.GetTop5ArtistsAsync(radio.name);
+                top5Artists = await _artistService.GetTop5ArtistsAsync(timeRange, radio.name);
                 allTop5Artists.Add(new TopArtistByRadio
                 {
                     TopType = radio.name,
@@ -62,14 +62,6 @@ namespace SpotifyPlaylistRadio.Controllers
             }
 
             return allTop5Artists;
-        }
-
-        [HttpGet("top5/{radio}")]
-        public async Task<List<TopArtist>> GetTop5Artist(string radio)
-        {
-            var top5Artists = await _artistService.GetTop5ArtistsAsync(radio);
-
-            return top5Artists;
         }
 
         [HttpPost]
