@@ -1,3 +1,4 @@
+using SpotifyPlaylistRadio.Hubs;
 using SpotifyPlaylistRadio.Models;
 using SpotifyPlaylistRadio.Services;
 using SpotifyPlaylistRadio.Socket;
@@ -38,14 +39,18 @@ internal class Program
             });
         });
 
+        builder.Services.AddSignalR();
+
         builder.Services.AddSingleton<ISocketMessages, SocketMessage>();
         builder.Services.AddSingleton<ISearchHelperService, SearchHelperService>();
         builder.Services.AddScoped<IInitService, InitService>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        builder.Services.AddSingleton <IMessageWriter,MessageWriter>();
         builder.Services.AddSingleton<RadiosService>();
         builder.Services.AddSingleton<PlaylistService>();
         builder.Services.AddSingleton<MusicSpotifyService>();
         builder.Services.AddSingleton<ArtistService>();
+
 
         builder.Services.AddControllers();
         //.AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
@@ -59,34 +64,21 @@ internal class Program
 
         app.UseCors("ClientPermission");
 
-        //var webSocketOptions = new WebSocketOptions
-        //{
-        //    KeepAliveInterval = TimeSpan.FromMinutes(2)
-        //};
+        using (var serviceScope = app.Services.CreateScope())
+        {
+            var services = serviceScope.ServiceProvider;
 
-        //app.UseWebSockets(webSocketOptions);
+            var init = services.GetRequiredService<IInitService>();
 
-        //app.Run(async (context) =>
-        //{
-        //    if (context.WebSockets.IsWebSocketRequest)
-        //    {
-        //        WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-
-        //        using (var serviceScope = app.Services.CreateScope())
-        //        {
-        //            var services = serviceScope.ServiceProvider;
-
-        //            var init = services.GetRequiredService<IInitService>();
-
-        //            //Use the service
-        //            await init.something(context, webSocket);
-        //        }
-        //    }
-        //});
+            //Use the service
+            init.something();
+        }
 
         app.UseRouting();
 
         app.UseHttpsRedirection();
+
+        app.MapHub<ChatHub>("chatHub");
 
         app.MapControllers();
         app.Run();

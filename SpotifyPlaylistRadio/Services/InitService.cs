@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
-using OpenQA.Selenium.Internal;
+using SpotifyPlaylistRadio.Hubs;
 using SpotifyPlaylistRadio.Models;
 using SpotifyPlaylistRadio.Models.ReadDataFromRadio;
 using SpotifyPlaylistRadio.Socket;
-using System.Net.WebSockets;
 
 namespace SpotifyPlaylistRadio.Services
 {
@@ -12,25 +11,113 @@ namespace SpotifyPlaylistRadio.Services
         private readonly ISpotifyAccountService _spotifyAccountService;
         private readonly ISpotifyService _spotifyService;
         private readonly IConfiguration _configuration;
-        private readonly ISocketMessages _socketMessages;
         private readonly RadiosService _radiosService;
         private readonly PlaylistService _playlistService;
         private readonly MusicSpotifyService _musicSpotifyService;
         private readonly ArtistService _artistsService;
+        private readonly IMessageWriter _messageWriter;
 
-        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, ISocketMessages socketMessages, RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService)
+
+        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, IMessageWriter messageWriter)
         {
             _spotifyAccountService = spotifyAccountService;
             _spotifyService = spotifyService;
             _configuration = configuration;
-            _socketMessages = socketMessages;
             _radiosService = radiosService;
             _playlistService = playlistService;
             _musicSpotifyService = musicSpotifyService;
             _artistsService = artistsService;
+            _messageWriter = messageWriter;
         }
 
-        public async Task something(HttpContext context, WebSocket ws)
+        public async Task something()
+        {
+            await _messageWriter.SendMessageSocket("Connected", MessageType.Log, "None");
+
+            AuthToken authToken = await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
+
+            List<Radio> radiosList = _configuration.GetSection("Radios").Get<List<Radio>>(); //Replace with database
+
+            DateTime lastRefresh = DateTime.Now;
+
+            var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: x => x.name, elementSelector: x => "");
+           
+            Playlists playlists = null;
+            //while (playlists == null)
+            //{
+                playlists = await _spotifyService.GetUsersPlaylist(authToken.access_token);
+            //}
+
+            while (true)
+            {
+                foreach (Radio r in radiosList)
+                {
+                    //await _radiosService.CreateAsync(r);
+                    await _messageWriter.SendMessageSocket("{\"Radio\":\"" + r.name + "\"}", MessageType.PlayingNow, r.name);
+                    SongScraped scrapedSong = await GetSongFromSite(r);
+                    if (scrapedSong != null)
+                    {
+                        Playlist playlist = await GetPlaylist(playlists, authToken.access_token, r.name);
+                        if (playlist != null)
+                        {
+                            if (NeedsNewRefresh(lastRefresh))
+                            {
+                                authToken = await NewRefreshToken();
+                                lastRefresh = DateTime.Now;
+                            }
+
+                            //SongScraped scrapedSong = new() { Title = "Tightrope", Artist = "Janelle Monáe c/ Big Boi" };
+
+                            if (!IsLastMusicPlayedOnRadio(scrapedSong.Title, lastMusicPlayedOnRadio[r.name]))
+                            {
+                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
+                                await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.name, MessageType.Log, r.name);
+
+                                lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
+
+                                if (IsPodcast(scrapedSong, r))
+                                    await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.name, MessageType.Log, r.name);
+                                else
+                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.name, playlist.id);
+
+                            }
+                            await RemoveTrackIfReachesMax(authToken.access_token, r.name, playlist.id);
+                        }
+                    }
+                }
+                //await TimerToRefresh();
+
+            }
+
+            return;
+        }
+
+        private static bool NeedsNewRefresh(DateTime lastRefresh)
+        {
+            return lastRefresh.Add(new TimeSpan(0, 50, 0)).CompareTo(DateTime.Now) < 0;
+        }
+
+        private static bool IsPodcast(SongScraped scrapedSong, Radio r)
+        {
+            return !(scrapedSong.Title != "" && scrapedSong.Artist != "" && !r.Podcasts.Contains(scrapedSong.Title));
+        }
+
+        private static bool IsLastMusicPlayedOnRadio(string songTitle, string lastMusicPlayedOnRadio)
+        {
+            return songTitle == lastMusicPlayedOnRadio;
+        }
+
+        //private async Task SendMessageSocket(string message, MessageType messageType, string radioName)
+        //{
+        //    await _messageWriter.Write(JsonConvert.SerializeObject(new SendSocketMessage { Message = message, TimeStamp = DateTime.Now, MessageType = messageType, RadioName = radioName }));
+        //}
+
+        private async Task<AuthToken> NewRefreshToken()
+        {
+            return await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
+        }
+
+        private async Task RemoveTrackIfReachesMax(string accessToken, string radioName, string playlistID)
         {
             int MAX_MAX_SIZE = 9000;
             int MIN_SIZE = 10;
@@ -41,135 +128,65 @@ namespace SpotifyPlaylistRadio.Services
                     _configuration.GetSection("Playlist:DefaultSize").Get<int>() :
                     _configuration.GetSection("Playlist:MaxSize").Get<int>();
 
-            CancellationToken ct = context.RequestAborted;
-            string currentSubscriberId;
+            Playlist radioPlaylist = await _spotifyService.GetPlaylist(accessToken, playlistID);
 
-            currentSubscriberId = _socketMessages.AddSubscriber(ws);
-
-            await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Connected", TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = "None" }));
-
-            AuthToken authToken = await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
-
-            List<Radio> radiosList = _configuration.GetSection("Radios").Get<List<Radio>>();
-
-            DateTime lastRefresh = DateTime.Now;
-
-
-            var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: x => x.name, elementSelector: x => "");
-
-            while (true)
+            if (radioPlaylist.Tracks.total > maxSize)
             {
-                if (ct.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = DateTime.Now.ToString(), TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = "None" }));
-
-                foreach (Radio r in radiosList)
-                {
-
-                    //await _radiosService.CreateAsync(r);
-                    SongScraped scrapedSong = await GetSongFromSite(r);
-                    if (scrapedSong != null)
-                    {
-
-                        await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", TimeStamp = DateTime.Now, MessageType = MessageType.PlayingNow, RadioName = r.name }));
-                        await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Music " + scrapedSong.Title + " is playing on " + r.name, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = r.name }));
-
-                        Playlist p = await GetPlaylist(authToken.access_token, _spotifyService, r.name);
-                        if (p != null)
-                        {
-
-                            if (lastRefresh.Add(new TimeSpan(0, 50, 0)).CompareTo(DateTime.Now) < 0)
-                            {
-                                authToken = await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
-                                lastRefresh = DateTime.Now;
-                            }
-
-                            //SongScraped scrapedSong = new() { Title = "Tightrope", Artist = "Janelle Monáe c/ Big Boi" };
-
-                            if (scrapedSong.Title != lastMusicPlayedOnRadio[r.name])
-                            {
-                                lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
-
-                                if (scrapedSong.Title != "" && scrapedSong.Artist != "" && !r.Podcasts.Contains(scrapedSong.Title))
-                                {
-                                    MusicSpotify music = await _spotifyService.SearchMusicPlaying(authToken.access_token, scrapedSong, r.name);
-
-                                    if (music != null)
-                                    {
-                                        music.radioName = r.name;
-                                        music.timestamp = DateTime.UtcNow;
-                                        await _musicSpotifyService.CreateAsync(music);
-                                        foreach (Artist a in music.artists)
-                                        {
-                                            a.radioName = r.name;
-                                            a.timestamp = DateTime.UtcNow;
-                                            await _artistsService.CreateAsync(a);
-
-                                        }
-                                        await _spotifyService.AddToPlaylist(authToken.access_token, p.id, music, r.name);
-                                    }
-                                }
-                                else
-                                {
-                                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Playing podcast or info on " + r.name, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = r.name }));
-                                }
-                            }
-
-                            Playlist radioPlaylist = await _spotifyService.GetPlaylist(authToken.access_token, p.id);
-
-                            if (radioPlaylist.Tracks.total > maxSize)
-                            {
-                                await _spotifyService.RemoveTracksWhenPlaylistReachesMaxSize(authToken.access_token, radioPlaylist, maxSize, r.name);
-                            }
-                        }
-                    }
-                }
-
-                int SECONDS_TIL_REFRESH = 90;
-                for (int i = 0; i < SECONDS_TIL_REFRESH; i++)
-                {
-                    await Task.Delay(1000);
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = (SECONDS_TIL_REFRESH - i).ToString(), TimeStamp = DateTime.Now, MessageType = MessageType.Timer, RadioName = "None" }));
-                }
+                await _spotifyService.RemoveTracksWhenPlaylistReachesMaxSize(accessToken, radioPlaylist, maxSize, radioName);
             }
-
-            if (!string.IsNullOrWhiteSpace(currentSubscriberId))
-            {
-                _socketMessages.RemoveSubscriber(currentSubscriberId);
-                if (ws != null)
-                {
-                    await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                    ws.Dispose();
-                }
-            }
-
-            return;
         }
 
-        private async Task<Playlist> GetPlaylist(string access_token, ISpotifyService _spotifyService, string selectedRadio)
+        private async Task SearchAndAddSongToPlaylist(string accessToken, SongScraped scrapedSong, string radioName, string playlistID)
         {
-            Playlists playlists = await _spotifyService.GetUsersPlaylist(access_token);
-            
+            MusicSpotify music = await _spotifyService.SearchMusicPlaying(accessToken, scrapedSong, radioName);
 
-            if (playlists != null)
+            if (music != null)
             {
-                Playlist p = playlists.items.FirstOrDefault((item) => item.name == "Listening " + selectedRadio);
+                await _spotifyService.AddToPlaylist(accessToken, playlistID, music, radioName);
+
+                await PrepareAndAddInfoToDB(music, radioName);
+            }
+        }
 
 
-                p ??= await _spotifyService.CreatePlaylist(access_token, new Dictionary<string, string> {
+        private async Task PrepareAndAddInfoToDB(MusicSpotify music, string radioName)
+        {
+            music.radioName = radioName;
+            music.timestamp = DateTime.UtcNow;
+            await _musicSpotifyService.CreateAsync(music);
+            foreach (Artist a in music.artists)
+            {
+                a.radioName = radioName;
+                a.timestamp = DateTime.UtcNow;
+                await _artistsService.CreateAsync(a);
+            }
+        }
+
+        private async Task TimerToRefresh()
+        {
+            int SECONDS_TIL_REFRESH = 90;
+            for (int i = 0; i < SECONDS_TIL_REFRESH; i++)
+            {
+                await Task.Delay(1000);
+                await _messageWriter.SendMessageSocket((SECONDS_TIL_REFRESH - i).ToString(), MessageType.Timer, "None");
+            }
+        }
+
+        private async Task<Playlist> GetPlaylist(Playlists playlists, string access_token, string selectedRadio)
+        {
+            Playlist p = playlists.items.FirstOrDefault((item) => item.name == "Listening " + selectedRadio);
+            if (p == null)
+            {
+                p = await _spotifyService.CreatePlaylist(access_token, new Dictionary<string, string> {
                                         { "name", "Listening "+ selectedRadio},
                                         { "description", "Automatically updated playlist from what is playing in "+selectedRadio },
                                         { "public", "true" }
                                     });
-                //await _playlistService.CreateAsync(p);
-
-                return p;
+                playlists.items.Add(p);
             }
+            //await _playlistService.CreateAsync(p);
 
-            return null;
+            return p;
         }
 
         private static async Task<SongScraped> GetSongFromSite(Radio selectedRadio)

@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using SpotifyPlaylistRadio.Socket;
+using SpotifyPlaylistRadio.Hubs;
 
 namespace SpotifyPlaylistRadio.Services
 {
@@ -11,13 +12,13 @@ namespace SpotifyPlaylistRadio.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ISearchHelperService _searchHelperService;
-        private readonly ISocketMessages _socketMessages;
+        private readonly IMessageWriter _messageWriter;
 
-        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, ISocketMessages socketMessages)
+        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, ISocketMessages socketMessages, IMessageWriter messageWriter)
         {
             _httpClient = httpClient;
             _searchHelperService = searchHelperService;
-            _socketMessages = socketMessages;
+            _messageWriter = messageWriter;
         }
 
         public async Task<Playlists> GetUsersPlaylist(string token)
@@ -108,11 +109,9 @@ namespace SpotifyPlaylistRadio.Services
                 {
                     await DeleteSongFromPlaylist(token, playlist.id, t.track.uri);
 
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Playlist " + playlist.name + " reached Max Size. Remove song " + t.track.name, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = radioName }));
-
+                    await _messageWriter.SendMessageSocket("Playlist " + playlist.name + " reached Max Size. Remove song " + t.track.name, MessageType.Log, radioName );
 
                     //TODO - Send log  - playlist X reached Max Size remove song y
-
                 }
             }
         }
@@ -139,14 +138,12 @@ namespace SpotifyPlaylistRadio.Services
                 //TODO - Send log  - found music being searched or music not found 
                 if (searchResult != null)
                 {
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Music found: " + song.Title, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = radioName }));
-
+                    await _messageWriter.SendMessageSocket("Music found: " + song.Title, MessageType.Log, radioName );
                 }
                 else
                 {
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Music not found: " + song.Title, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = radioName }));
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Info searching - Not found: Title - " + song.Title + " // Artist - " + song.Artist, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = radioName }));
-
+                    await _messageWriter.SendMessageSocket("Music not found: " + song.Title, MessageType.Log, radioName );
+                    await _messageWriter.SendMessageSocket("Info searching - Not found: Title - " + song.Title + " // Artist - " + song.Artist,  MessageType.Log, radioName );
                 }
                 
                 return searchResult;
@@ -171,7 +168,7 @@ namespace SpotifyPlaylistRadio.Services
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Music " + music.name + " was added to the playlist " + playlist_id, TimeStamp = DateTime.Now, MessageType = MessageType.Log, RadioName = radioName }));
+                await _messageWriter.SendMessageSocket("Music " + music.name + " was added to the playlist " + playlist_id, MessageType.Log, radioName);
 
                 //TODO - Send log  - add music X to playlist Y
                 return JsonConvert.DeserializeObject<Playlist>(jsonString);

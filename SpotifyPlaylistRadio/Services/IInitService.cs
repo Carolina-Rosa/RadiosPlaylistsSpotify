@@ -4,6 +4,6 @@ namespace SpotifyPlaylistRadio.Services
 {
     public interface IInitService
     {
-        Task something(HttpContext context, WebSocket ws);
+        Task something(/*HttpContext context, WebSocket ws*/);
     }
 }
