@@ -3,7 +3,6 @@ using SpotifyPlaylistRadio.Models;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
-using SpotifyPlaylistRadio.Socket;
 using SpotifyPlaylistRadio.Hubs;
 
 namespace SpotifyPlaylistRadio.Services
@@ -14,7 +13,7 @@ namespace SpotifyPlaylistRadio.Services
         private readonly ISearchHelperService _searchHelperService;
         private readonly IMessageWriter _messageWriter;
 
-        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, ISocketMessages socketMessages, IMessageWriter messageWriter)
+        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, IMessageWriter messageWriter)
         {
             _httpClient = httpClient;
             _searchHelperService = searchHelperService;
@@ -134,7 +133,7 @@ namespace SpotifyPlaylistRadio.Services
                 var jsonString = await response.Content.ReadAsStringAsync();
                 Search s = JsonConvert.DeserializeObject<Search>(jsonString);
 
-                MusicSpotify searchResult = await _searchHelperService.CompareSongScrapedWithSearchResults(song.Artist, s.tracks.items);
+                MusicSpotify searchResult = await _searchHelperService.CompareSongScrapedWithSearchResults(song.Artist, s.tracks.items, radioName);
                 //TODO - Send log  - found music being searched or music not found 
                 if (searchResult != null)
                 {

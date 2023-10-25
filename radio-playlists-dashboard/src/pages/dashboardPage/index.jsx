@@ -45,7 +45,7 @@ export default function DashboardPage() {
             logsListByRadio,
             setLogsListByRadio
         );
-    }, [messageFromSocket, logsListByRadio]);
+    }, [messageFromSocket, logsListByRadio, radiosList]);
 
     return (
         <div className="dashboard-page">
@@ -79,6 +79,7 @@ const separateMessages = (
     logsListByRadio,
     setLogsListByRadio
 ) => {
+    console.log(messageFromSocket.MessageType);
     switch (messageFromSocket.MessageType) {
         case 0:
             var myObject = JSON.parse(messageFromSocket.Message);

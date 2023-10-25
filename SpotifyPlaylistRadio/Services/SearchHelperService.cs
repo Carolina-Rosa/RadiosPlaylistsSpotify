@@ -1,21 +1,21 @@
 ﻿using AngleSharp.Text;
 using Newtonsoft.Json;
+using SpotifyPlaylistRadio.Hubs;
 using SpotifyPlaylistRadio.Models;
-using SpotifyPlaylistRadio.Socket;
 using System.Text.RegularExpressions;
 
 namespace SpotifyPlaylistRadio.Services
 {
     public class SearchHelperService : ISearchHelperService
     {
-        private readonly ISocketMessages _socketMessages;
+        private readonly IMessageWriter _messageWriter;
 
-        public SearchHelperService(ISocketMessages socketMessages)
+        public SearchHelperService(IMessageWriter messageWrite)
         {
-            _socketMessages = socketMessages;
+            _messageWriter = messageWrite;
         }
 
-        public async Task<MusicSpotify> CompareSongScrapedWithSearchResults(string songArtist, List<MusicSpotify> searchResults)
+        public async Task<MusicSpotify> CompareSongScrapedWithSearchResults(string songArtist, List<MusicSpotify> searchResults, string radioName)
         {
 
             songArtist= PrepareStringToCompare(songArtist);
@@ -28,7 +28,7 @@ namespace SpotifyPlaylistRadio.Services
                  {
                     artist.name = PrepareStringToCompare(artist.name);
                     
-                    await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Comparing artists: " + songArtist+ "  with : " + artist.name, TimeStamp = DateTime.Now, MessageType = MessageType.Log }));
+                    await _messageWriter.SendMessageSocket("Comparing artists: " + songArtist+ "  with : " + artist.name, MessageType.Log, radioName);
                     if (artist.name.Equals(songArtist, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return spotifyMusic;
@@ -38,7 +38,7 @@ namespace SpotifyPlaylistRadio.Services
                     {
                         foreach (var artistFromMultipleArtists in splitBySeparator)
                         {
-                            await _socketMessages.SendNotification(JsonConvert.SerializeObject(new SendSocketMessage { Message = "Comparing artists: " + artistFromMultipleArtists + "  with : " + artist.name, TimeStamp = DateTime.Now, MessageType = MessageType.Log }));
+                            await _messageWriter.SendMessageSocket("Comparing artists: " + artistFromMultipleArtists + "  with : " + artist.name, MessageType.Log, radioName);
 
                             if (artist.name.Equals(artistFromMultipleArtists, StringComparison.InvariantCultureIgnoreCase))
                             {

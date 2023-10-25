@@ -1,9 +1,6 @@
 using SpotifyPlaylistRadio.Hubs;
 using SpotifyPlaylistRadio.Models;
 using SpotifyPlaylistRadio.Services;
-using SpotifyPlaylistRadio.Socket;
-using System.Net.WebSockets;
-using System.Text;
 
 internal class Program
 {
@@ -41,7 +38,6 @@ internal class Program
 
         builder.Services.AddSignalR();
 
-        builder.Services.AddSingleton<ISocketMessages, SocketMessage>();
         builder.Services.AddSingleton<ISearchHelperService, SearchHelperService>();
         builder.Services.AddScoped<IInitService, InitService>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
