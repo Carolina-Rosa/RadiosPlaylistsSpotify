@@ -9,6 +9,7 @@ namespace SpotifyPlaylistRadio.Services
     {
         private readonly IMongoCollection<MusicSpotify> _musicSpotifyCollection;
 
+
         public MusicSpotifyService(
             IOptions<SpotifyPlaylistsFromRadioDatabaseSettings> spotifyPlaylistsFromRadioDatabaseSettings)
         {
@@ -21,11 +22,14 @@ namespace SpotifyPlaylistRadio.Services
             _musicSpotifyCollection = mongoDatabase.GetCollection<MusicSpotify>("MusicSpotify");
         }
 
+
         public async Task<List<MusicSpotify>> GetAsync() =>
             await _musicSpotifyCollection.Find(_ => true).ToListAsync();
 
+
         public async Task<MusicSpotify?> GetAsync(string id) =>
             await _musicSpotifyCollection.Find(x => x._id == id).FirstOrDefaultAsync();
+
 
         public async Task<List<TopSong>> GetTop5SongsAsync(TimeRange timeRange, string radio)
         {
@@ -56,8 +60,10 @@ namespace SpotifyPlaylistRadio.Services
         public async Task CreateAsync(MusicSpotify newPlaylist) =>
             await _musicSpotifyCollection.InsertOneAsync(newPlaylist);
 
+
         public async Task UpdateAsync(string id, MusicSpotify updatedMusicSpotify) =>
             await _musicSpotifyCollection.ReplaceOneAsync(x => x._id == id, updatedMusicSpotify);
+
 
         public async Task RemoveAsync(string id) =>
             await _musicSpotifyCollection.DeleteOneAsync(x => x._id == id);

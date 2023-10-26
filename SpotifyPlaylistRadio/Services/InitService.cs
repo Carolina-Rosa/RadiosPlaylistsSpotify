@@ -56,7 +56,7 @@ namespace SpotifyPlaylistRadio.Services
                     SongScraped scrapedSong = await GetSongFromSite(r);
                     if (scrapedSong != null)
                     {
-                        Playlist playlist = await GetPlaylist(playlists, authToken.access_token, r.name);
+                        Playlist playlist = await GetPlaylist(playlists, authToken.access_token, r.displayName);
                         if (playlist != null)
                         {
                             if (NeedsNewRefresh(lastRefresh))
@@ -70,22 +70,22 @@ namespace SpotifyPlaylistRadio.Services
                             if (!IsLastMusicPlayedOnRadio(scrapedSong.Title, lastMusicPlayedOnRadio[r.name]))
                             {
                                 lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
-                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
+                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.displayName);
 
                                 if (IsPodcast(scrapedSong, r))
-                                    await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.name, MessageType.Log, r.name);
+                                    await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.displayName, MessageType.Log, r.displayName);
                                 else
                                 {
-                                    await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.name, MessageType.Log, r.name);
+                                    await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.displayName, MessageType.Log, r.displayName);
 
-                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.name, playlist.id);
+                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.displayName, playlist.id);
 
                                     await RemoveTrackIfReachesMax(authToken.access_token, r.name, playlist.id);
                                 }
 
                             }
                             else
-                                await _messageWriter.SendMessageSocket("Still playing " + scrapedSong.Title + " on " + r.name, MessageType.Log, r.name);
+                                await _messageWriter.SendMessageSocket("Still playing " + scrapedSong.Title + " on " + r.displayName, MessageType.Log, r.name);
                         }
                     }
                 }
