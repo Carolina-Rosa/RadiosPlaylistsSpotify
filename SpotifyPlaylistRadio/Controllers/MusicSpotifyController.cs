@@ -37,35 +37,6 @@ namespace SpotifyPlaylistRadio.Controllers
 
             return musicSpotify;
         }
-
-        [HttpGet("top5")]
-        public async Task<List<TopSongsByRadio>> GetTop5Songs()
-        {
-            const string TOP5_SONGS_GLOBAL = "GLOBAL";
-
-            var radios = await _radiosService.GetAsync();
-
-            var allTop5Songs = new List<TopSongsByRadio>();
-
-            var top5Songs = await _musicSpotifyService.GetTop5SongsAsync(TimeRange.FromStart, TOP5_SONGS_GLOBAL);
-            allTop5Songs.Add(new TopSongsByRadio
-            {
-                TopType = "Global",
-                TopSongs = top5Songs
-            });
-
-            foreach (var radio in radios)
-            {
-                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(TimeRange.FromStart, radio.name);
-                allTop5Songs.Add(new TopSongsByRadio
-                {
-                    TopType = radio.name,
-                    TopSongs = top5Songs
-                });
-            }
-
-            return allTop5Songs;
-        }
         
         [HttpGet("top5/{timeRange}")]
         public async Task<List<TopSongsByRadio>> GetTop5SongsByTimeRange(TimeRange timeRange = TimeRange.FromStart)
@@ -85,10 +56,10 @@ namespace SpotifyPlaylistRadio.Controllers
 
             foreach (var radio in radios)
             {
-                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, radio.name);
+                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, radio.displayName);
                 allTop5Songs.Add(new TopSongsByRadio
                 {
-                    TopType = radio.name,
+                    TopType = radio.displayName,
                     TopSongs = top5Songs
                 });
             }

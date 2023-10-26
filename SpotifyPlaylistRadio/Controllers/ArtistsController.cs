@@ -56,7 +56,7 @@ namespace SpotifyPlaylistRadio.Controllers
                 top5Artists = await _artistService.GetTop5ArtistsAsync(timeRange, radio.name);
                 allTop5Artists.Add(new TopArtistByRadio
                 {
-                    TopType = radio.name,
+                    TopType = radio.displayName,
                     TopArtists = top5Artists
                 });
             }

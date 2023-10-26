@@ -26,6 +26,7 @@ namespace SpotifyPlaylistRadio.Services
         public async Task<List<Artist>> GetAsync() =>
             await _artistCollection.Find(_ => true).ToListAsync();
 
+
         public async Task<Artist?> GetAsync(string id) =>
             await _artistCollection.Find(x => x._id == id).FirstOrDefaultAsync();
 
@@ -58,11 +59,14 @@ namespace SpotifyPlaylistRadio.Services
         public async Task CreateAsync(Artist newArtist) =>
             await _artistCollection.InsertOneAsync(newArtist);
 
+
         public async Task UpdateAsync(string id, Artist updatedArtist) =>
             await _artistCollection.ReplaceOneAsync(x => x._id == id, updatedArtist);
 
+
         public async Task RemoveAsync(string id) =>
             await _artistCollection.DeleteOneAsync(x => x._id == id);
+
 
         private DateTime getDateTimeRange(TimeRange timeRange)
         {
