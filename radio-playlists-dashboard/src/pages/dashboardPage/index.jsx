@@ -29,14 +29,15 @@ export default function DashboardPage() {
             .then((result) => {
                 console.log("Connected!");
 
-                newConnection.on("ReceiveMessage", (message) => {
-                    setMessageFromSocket(JSON.parse(message));
-                });
+                newConnection.on("ReceiveMessage", (message) =>
+                    setMessageFromSocket(JSON.parse(message))
+                );
             })
             .catch((e) => console.log("Connection failed: ", e));
     }, []);
 
     useEffect(() => {
+        console.log(messageFromSocket);
         separateMessages(
             messageFromSocket,
             setCountdownValue,
@@ -45,7 +46,7 @@ export default function DashboardPage() {
             logsListByRadio,
             setLogsListByRadio
         );
-    }, [messageFromSocket, logsListByRadio, radiosList]);
+    }, [messageFromSocket]); //
 
     return (
         <div className="dashboard-page">
@@ -79,7 +80,7 @@ const separateMessages = (
     logsListByRadio,
     setLogsListByRadio
 ) => {
-    console.log(messageFromSocket.MessageType);
+    console.log("SEPARATE MESSAGES");
     switch (messageFromSocket.MessageType) {
         case 0:
             var myObject = JSON.parse(messageFromSocket.Message);
@@ -103,7 +104,6 @@ const separateMessages = (
             }
             break;
         case 1:
-            //TODO - separte logs by radio
             var radioIndex = logsListByRadio.findIndex((obj) => {
                 return obj.radio === messageFromSocket.RadioName;
             });
@@ -122,7 +122,6 @@ const separateMessages = (
                     ...logsListByRadio
                 ]);
             }
-            //setLogs([...logs, messageFromSocket]);
             break;
         case 2:
             setCountdownValue(messageFromSocket.Message);
