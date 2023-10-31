@@ -9,6 +9,7 @@ namespace SpotifyPlaylistRadio.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string id;
         public string name { get; set; }
+        public string displayName { get; set; }
         public string dataFormat { get; set; }
         public string scrapingSongTitle { get; set; }
         public string scrapingSongArtist { get; set; }

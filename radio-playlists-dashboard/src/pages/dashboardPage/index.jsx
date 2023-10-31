@@ -8,7 +8,7 @@ import { HubConnectionBuilder, HttpTransportType } from "@microsoft/signalr";
 const WS_URL = "wss://localhost:7269/chatHub";
 
 export default function DashboardPage() {
-    const [radio, setRadio] = useState("Antena3");
+    const [radio, setRadio] = useState("Antena 3");
     const [countdownValue, setCountdownValue] = useState("90");
     const [radiosList, setRadiosList] = useState([]);
     const [logsListByRadio, setLogsListByRadio] = useState([]);
