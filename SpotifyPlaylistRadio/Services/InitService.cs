@@ -67,10 +67,10 @@ namespace SpotifyPlaylistRadio.Services
 
                             //SongScraped scrapedSong = new() { Title = "Tightrope", Artist = "Janelle Monáe c/ Big Boi" };
 
+                            await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
                             if (!IsLastMusicPlayedOnRadio(scrapedSong.Title, lastMusicPlayedOnRadio[r.name]))
                             {
                                 lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
-                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
 
                                 if (IsPodcast(scrapedSong, r))
                                     await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.name, MessageType.Log, r.name);
@@ -88,6 +88,8 @@ namespace SpotifyPlaylistRadio.Services
                                 await _messageWriter.SendMessageSocket("Still playing " + scrapedSong.Title + " on " + r.name, MessageType.Log, r.name);
                         }
                     }
+                    await Task.Delay(10);
+
                 }
                 await TimerToRefresh();
             }
