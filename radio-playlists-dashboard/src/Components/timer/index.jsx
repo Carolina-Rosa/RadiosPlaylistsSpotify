@@ -1,6 +1,9 @@
+import { useSelector } from "react-redux";
 import "./styles.scss";
 
-export default function Countdown({ countdownValue }) {
+export default function Countdown() {
+    const countdownValue = useSelector((state) => state.TimerMessage.value);
+
     const seconds = parseInt(countdownValue, 10);
     const secondsRadius = mapNumber(seconds, 90, 0, 0, 360);
 
