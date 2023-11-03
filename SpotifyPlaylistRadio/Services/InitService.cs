@@ -39,7 +39,7 @@ namespace SpotifyPlaylistRadio.Services
 
             DateTime lastRefresh = DateTime.Now;
 
-            var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: x => x.name, elementSelector: x => "");
+            var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: radio => radio.name, elementSelector: music => "");
            
             Playlists playlists = null;
             
@@ -72,15 +72,15 @@ namespace SpotifyPlaylistRadio.Services
                             {
                                 lastMusicPlayedOnRadio[r.name] = scrapedSong.Title;
 
-                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.displayName);
+                                await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
 
                                 if (IsPodcast(scrapedSong, r))
-                                    await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.displayName, MessageType.Log, r.displayName);
+                                    await _messageWriter.SendMessageSocket("Playing podcast or info on " + r.displayName, MessageType.Log, r.name);
                                 else
                                 {
-                                    await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.displayName, MessageType.Log, r.displayName);
+                                    await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.displayName, MessageType.Log, r.name);
 
-                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.displayName, playlist.id);
+                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.name, playlist.id);
 
                                     await RemoveTrackIfReachesMax(authToken.access_token, r.name, playlist.id);
                                 }
