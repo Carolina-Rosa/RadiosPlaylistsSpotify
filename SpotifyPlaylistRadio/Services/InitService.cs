@@ -14,10 +14,11 @@ namespace SpotifyPlaylistRadio.Services
         private readonly PlaylistService _playlistService;
         private readonly MusicSpotifyService _musicSpotifyService;
         private readonly ArtistService _artistsService;
+        private readonly RadiosService _radioService;
         private readonly IMessageWriter _messageWriter;
 
 
-        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, IMessageWriter messageWriter)
+        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, RadiosService radioService, IMessageWriter messageWriter)
         {
             _spotifyAccountService = spotifyAccountService;
             _spotifyService = spotifyService;
@@ -26,6 +27,7 @@ namespace SpotifyPlaylistRadio.Services
             _playlistService = playlistService;
             _musicSpotifyService = musicSpotifyService;
             _artistsService = artistsService;
+            _radioService = radioService;
             _messageWriter = messageWriter;
         }
 
@@ -35,7 +37,7 @@ namespace SpotifyPlaylistRadio.Services
 
             AuthToken authToken = await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
-            List<Radio> radiosList = _configuration.GetSection("Radios").Get<List<Radio>>(); //Replace with database
+            List<Radio> radiosList = await _radioService.GetAsync();
 
             DateTime lastRefresh = DateTime.Now;
 
@@ -52,7 +54,6 @@ namespace SpotifyPlaylistRadio.Services
             {
                 foreach (Radio r in radiosList)
                 {
-                    //await _radiosService.CreateAsync(r);
                     SongScraped scrapedSong = await GetSongFromSite(r);
                     if (scrapedSong != null)
                     {
@@ -64,8 +65,6 @@ namespace SpotifyPlaylistRadio.Services
                                 authToken = await NewRefreshToken();
                                 lastRefresh = DateTime.Now;
                             }
-
-                            //SongScraped scrapedSong = new() { Title = "Tightrope", Artist = "Janelle Monáe c/ Big Boi" };
 
                             await _messageWriter.SendMessageSocket("{\"Music\":\"" + scrapedSong.Title + "\", \"Artist\":\"" + scrapedSong.Artist + "\"}", MessageType.PlayingNow, r.name);
                             if (!IsLastMusicPlayedOnRadio(scrapedSong.Title, lastMusicPlayedOnRadio[r.name]))
@@ -185,9 +184,9 @@ namespace SpotifyPlaylistRadio.Services
                                         { "public", "true" }
                                     });
                 playlists.items.Add(p);
-            }
-            //await _playlistService.CreateAsync(p);
 
+                await _playlistService.CreateAsync(p);
+            }
             return p;
         }
 
