@@ -56,7 +56,7 @@ namespace SpotifyPlaylistRadio.Controllers
 
             foreach (var radio in radios)
             {
-                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, radio.displayName);
+                top5Songs = await _musicSpotifyService.GetTop5SongsAsync(timeRange, radio.name);
                 allTop5Songs.Add(new TopSongsByRadio
                 {
                     TopType = radio.displayName,
