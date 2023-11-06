@@ -1,0 +1,91 @@
+use SpotifyPlaylistsFromRadio
+
+db.createCollection("Radios")
+
+db.Radios.insertMany([
+    {
+      "name": "Antena3",
+      "displayName": "Antena 3",
+      "dataFormat": "ListAntena3",
+      "scrapingSongTitle": "dtitulo",
+      "scrapingSongArtist": "dcoment1",
+      "url": "https://www.rtp.pt/play/livechannelonairnow.php?channel=at3",
+      "Podcasts": [
+        "Vamos Todos Morrer ",
+        "Linha Avançada ",
+        "Prova Oral ",
+        "Voz de Cama ",
+        "Aleixo Amigo ",
+        "Aleixo FM ",
+        "Hip Hop 50 ",
+        "Paraíso Perdido ",
+        "Fricção Científica ",
+        "Portugalex "
+      ]
+    },
+    {
+      "name": "RadioNovaEra",
+      "displayName": "Radio Nova Era",
+      "dataFormat": "JSONRadioNovaEra",
+      "scrapingSongTitle": "track",
+      "scrapingSongArtist": "artist",
+      "url": "https://radionovaera.pt/api/player/currently-playing",
+      "Podcasts": [ "MÚSICA SEM PARAR" ]
+    },
+    {
+      "name": "RFM",
+      "displayName": "RFM",
+      "dataFormat": "XML2",
+      "url": "https://configsa01.blob.core.windows.net/rfm/rfmOnAir.xml?_=1689259475565",
+      "Podcasts": [ "" ]
+    },
+    {
+      "name": "MegaHits",
+      "displayName": "Mega Hits",
+      "dataFormat": "XML2",
+      "url": "https://configsa01.blob.core.windows.net/megahits/megaOnAir.xml?_=1689670033801",
+      "Podcasts": [ "INTHEMIX_WEDNESDAY_2" ]
+    },
+    {
+      "name": "Renascenca",
+      "displayName": "Renascença",
+      "dataFormat": "XML2",
+      "url": "https://configsa01.blob.core.windows.net/renascenca/rrOnAir.xml",
+      "Podcasts": [ "" ]
+    },
+    {
+      "name": "CidadeFM",
+      "displayName": "Cidade FM",
+      "dataFormat": "XML",
+      "url": "https://cidade.fm/nowplaying.xml",
+      "Podcasts": [ "SÓ SE QUISERES" ]
+    },
+    {
+      "name": "VodafoneFM",
+      "displayName": "Batida FM",
+      "dataFormat": "XML",
+      "url": "https://batida.fm/nowplaying.xml",
+      "Podcasts": [ "" ]
+    },
+    {
+      "name": "RadioComercial",
+      "displayName": "Radio Comercial",
+      "dataFormat": "XML",
+      "url": "https://radiocomercial.pt/nowplaying.xml",
+      "Podcasts": [ "A melhor musica, sempre. Em casa, no carro, em todo o lado " ]
+    },
+    {
+      "name": "M80",
+      "displayName": "M80",
+      "dataFormat": "XML",
+      "url": "https://m80.pt/nowplaying.xml",
+      "Podcasts": [ "M80 - Se a sua vida tem uma música, ela passa na M80 " ]
+    },
+    {
+      "name": "SmoothFM",
+      "displayName": "SmoothFM",
+      "dataFormat": "XML",
+      "url": "https://smoothfm.pt/nowplaying.xml",
+      "Podcasts": [ "SmoothFM ... and all that jazz!" ]
+    }
+  ])
