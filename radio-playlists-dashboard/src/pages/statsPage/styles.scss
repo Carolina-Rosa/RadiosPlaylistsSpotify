@@ -12,13 +12,8 @@
         text-transform: uppercase;
         margin: 0;
     }
-    .stats-subtitle {
-        color: $primary-color;
-        font-size: 30px;
-        margin-bottom: 50px;
-    }
 
-    .selected-tab {
+    .selected-tab-statsType {
         background-color: $primary-color-with-alpha;
         font-weight: 700;
         border-radius: 20px;
@@ -28,7 +23,7 @@
         vertical-align: middle;
     }
 
-    .tabs-list {
+    .tabs-list-statsType {
         background-color: $secondary-color;
         border-radius: 20px;
         height: 50px;
@@ -36,11 +31,11 @@
         color: $background-color;
         font-size: 25px;
         display: inline-grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         flex-direction: row;
         justify-content: space-between;
         list-style-type: none;
-        margin: 0;
+        margin: 20px 0;
         padding: 0;
         li {
             vertical-align: middle;
@@ -50,5 +45,12 @@
             height: 50px;
             align-self: center;
         }
+    }
+
+    .tab-panel-statsType.react-tabs__tab-panel--selected {
+        background-color: $secondary-color;
+        margin-top: 10px;
+        padding: 10px 50px;
+        border-radius: 20px;
     }
 }

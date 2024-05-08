@@ -3,16 +3,16 @@
 .top-5 {
     h1 {
         margin: 0;
-        font-size: 25px;
+        font-size: 20px;
         color: $primary-color;
         text-align: start;
     }
     .tops-section {
         display: flex;
         flex-direction: row;
-        margin-bottom: 50px;
+        margin-bottom: 30px;
         height: max-content;
-        padding: 10px 30px 30px 30px;
+        padding: 0px 30px 30px 30px;
         background-color: $base-color;
         border-radius: 30px;
     }
