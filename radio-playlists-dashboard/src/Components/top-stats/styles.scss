@@ -1,0 +1,41 @@
+@import "./../../utilities/variables.scss";
+
+.stats-subtitle {
+    color: $background-color;
+    font-size: 35px;
+    margin-bottom: 30px;
+}
+
+.selected-tab {
+    background-color: $base-color;
+    font-weight: 700;
+    border-radius: 20px;
+    color: $white;
+    height: 35px;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.tabs-list {
+    background-color: $base-color-with-alpha;
+    border-radius: 20px;
+    height: 35px;
+    width: 100%;
+    color: $white;
+    font-size: 20px;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    flex-direction: row;
+    justify-content: space-between;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    li {
+        vertical-align: middle;
+        text-align: center;
+        display: inline-block;
+        cursor: pointer;
+        height: 35px;
+        align-self: center;
+    }
+}

@@ -19,13 +19,14 @@ export default function TopItem({ itemNo, timesPlayed, songName, songArtist }) {
             onMouseOut={handleMouseOut}
         >
             <h1 className="position-number">#{itemNo}</h1>
+
             {isHovering ? (
                 <p className="times-played">{timesPlayed}x</p>
             ) : (
                 <>
                     <h2>
-                        {songName.length > 30
-                            ? songName.substr(0, 30) + "\u2026"
+                        {songName.length > 20
+                            ? songName.substr(0, 20) + "\u2026"
                             : songName}
                     </h2>
                     <p>{songArtist}</p>
