@@ -46,6 +46,7 @@ internal class Program
         builder.Services.AddSingleton<PlaylistService>();
         builder.Services.AddSingleton<MusicSpotifyService>();
         builder.Services.AddSingleton<ArtistService>();
+        builder.Services.AddSingleton<AuthToken>();
 
 
         builder.Services.AddControllers();
