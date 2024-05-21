@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SpotifyPlaylistRadio.Models;
+using SpotifyPlaylistRadio.Models.ReadDataFromRadio;
 using SpotifyPlaylistRadio.Models.Top5;
 
 namespace SpotifyPlaylistRadio.Services
@@ -8,10 +9,11 @@ namespace SpotifyPlaylistRadio.Services
     public class MusicSpotifyService
     {
         private readonly IMongoCollection<MusicSpotify> _musicSpotifyCollection;
-
+        private readonly ISpotifyService _spotifyService;
+        private readonly AuthToken _authToken;
 
         public MusicSpotifyService(
-            IOptions<SpotifyPlaylistsFromRadioDatabaseSettings> spotifyPlaylistsFromRadioDatabaseSettings)
+            IOptions<SpotifyPlaylistsFromRadioDatabaseSettings> spotifyPlaylistsFromRadioDatabaseSettings, ISpotifyService spotifyService, AuthToken authToken)
         {
             var mongoClient = new MongoClient(
                 spotifyPlaylistsFromRadioDatabaseSettings.Value.ConnectionURI);
@@ -20,6 +22,8 @@ namespace SpotifyPlaylistRadio.Services
                 spotifyPlaylistsFromRadioDatabaseSettings.Value.DatabaseName);
 
             _musicSpotifyCollection = mongoDatabase.GetCollection<MusicSpotify>("MusicSpotify");
+            _spotifyService = spotifyService;
+            _authToken = authToken;
         }
 
 
@@ -55,7 +59,19 @@ namespace SpotifyPlaylistRadio.Services
 
             return topValues;
         }
+        
+        public async Task<MusicPlayed> GetWhatWasPlaying(string radioName, DateTime dateTime)
+        {
+            var allSongs = await _musicSpotifyCollection.Find(x => x.radioName == radioName && x.timestamp.CompareTo(dateTime.AddMinutes(-5))>0 && x.timestamp.CompareTo(dateTime.AddMinutes(2)) < 0).ToListAsync();
+            Console.WriteLine(allSongs);
+            if (allSongs.Count == 0)
+            {
+                return null;
+            }
+             var musicPlayed = await _spotifyService.GetMusicByID(_authToken.access_token, allSongs[0].id);
 
+            return musicPlayed;
+        }
 
         public async Task CreateAsync(MusicSpotify newPlaylist) =>
             await _musicSpotifyCollection.InsertOneAsync(newPlaylist);
