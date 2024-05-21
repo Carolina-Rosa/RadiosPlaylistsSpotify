@@ -16,9 +16,12 @@ namespace SpotifyPlaylistRadio.Services
         private readonly ArtistService _artistsService;
         private readonly RadiosService _radioService;
         private readonly IMessageWriter _messageWriter;
+        private readonly AuthToken _authToken;
 
 
-        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, RadiosService radioService, IMessageWriter messageWriter)
+        public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, 
+            RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, 
+            RadiosService radioService, IMessageWriter messageWriter, AuthToken authToken)
         {
             _spotifyAccountService = spotifyAccountService;
             _spotifyService = spotifyService;
@@ -29,13 +32,14 @@ namespace SpotifyPlaylistRadio.Services
             _artistsService = artistsService;
             _radioService = radioService;
             _messageWriter = messageWriter;
+            _authToken = authToken;
         }
 
         public async Task something()
         {
             await _messageWriter.SendMessageSocket("Connected", MessageType.Log, "None");
 
-            AuthToken authToken = await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
+            await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
             List<Radio> radiosList = await _radioService.GetAsync();
 
@@ -47,7 +51,7 @@ namespace SpotifyPlaylistRadio.Services
             
             while (playlists == null)
             {
-                playlists = await _spotifyService.GetUsersPlaylist(authToken.access_token);
+                playlists = await _spotifyService.GetUsersPlaylist(_authToken.access_token);
             }
 
             while (true)
@@ -57,12 +61,12 @@ namespace SpotifyPlaylistRadio.Services
                     SongScraped scrapedSong = await GetSongFromSite(r);
                     if (scrapedSong != null)
                     {
-                        Playlist playlist = await GetPlaylist(playlists, authToken.access_token, r.displayName);
+                        Playlist playlist = await GetPlaylist(playlists, _authToken.access_token, r.displayName);
                         if (playlist != null)
                         {
                             if (NeedsNewRefresh(lastRefresh))
                             {
-                                authToken = await NewRefreshToken();
+                                await NewRefreshToken();
                                 lastRefresh = DateTime.Now;
                             }
 
@@ -79,9 +83,9 @@ namespace SpotifyPlaylistRadio.Services
                                 {
                                     await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.displayName, MessageType.Log, r.name);
 
-                                    await SearchAndAddSongToPlaylist(authToken.access_token, scrapedSong, r.name, playlist.id);
+                                    await SearchAndAddSongToPlaylist(_authToken.access_token, scrapedSong, r.name, playlist.id);
 
-                                    await RemoveTrackIfReachesMax(authToken.access_token, r.name, playlist.id);
+                                    await RemoveTrackIfReachesMax(_authToken.access_token, r.name, playlist.id);
                                 }
 
                             }
@@ -113,9 +117,9 @@ namespace SpotifyPlaylistRadio.Services
             return songTitle == lastMusicPlayedOnRadio;
         }
 
-        private async Task<AuthToken> NewRefreshToken()
+        private async Task NewRefreshToken()
         {
-            return await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
+            await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
         }
 
         private async Task RemoveTrackIfReachesMax(string accessToken, string radioName, string playlistID)
