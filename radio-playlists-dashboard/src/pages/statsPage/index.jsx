@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import "./styles.scss";
 import TopStats from "../../Components/top-stats";

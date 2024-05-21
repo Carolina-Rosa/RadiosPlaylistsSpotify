@@ -9,10 +9,12 @@ namespace SpotifyPlaylistRadio.Services
     public class SpotifyAccountService : ISpotifyAccountService
     {
         private readonly HttpClient _httpClient;
+        private readonly AuthToken _authToken;
 
-        public SpotifyAccountService(HttpClient httpClient)
+        public SpotifyAccountService(HttpClient httpClient, AuthToken authToken)
         {
             _httpClient = httpClient;
+            _authToken = authToken;
         }
 
         public async Task<AuthToken> RefreshToken(string refreshToken, string clientId, string clientSecret)
@@ -30,7 +32,11 @@ namespace SpotifyPlaylistRadio.Services
             if (response.IsSuccessStatusCode)
             {
                 string jsonString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<AuthToken>(jsonString);
+                var tokenResponse = JsonConvert.DeserializeObject<AuthToken>(jsonString);
+
+                _authToken.access_token = tokenResponse.access_token;
+                _authToken.token_type= tokenResponse.token_type;
+                _authToken.expires_in = tokenResponse.expires_in;
             }
             return null;
         }
