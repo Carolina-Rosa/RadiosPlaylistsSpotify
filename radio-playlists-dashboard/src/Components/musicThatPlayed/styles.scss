@@ -1,0 +1,39 @@
+@import "./../../utilities/variables.scss";
+
+.music-that-played-container {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    height: 100%;
+
+    .image {
+        text-align: center;
+        img {
+            height: 400px;
+            width: 400px;
+            object-fit: cover;
+            vertical-align: bottom;
+        }
+    }
+    .music-info {
+        margin: auto 0 15px;
+        color: $background-color;
+        width: 100%;
+        p {
+            margin-bottom: 30px;
+        }
+        .button-to-spotify {
+            background-color: $secondary-color;
+            border: 0;
+            border-radius: 20px;
+            width: 50%;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: $white;
+            &:hover {
+                background-color: $base-color;
+            }
+        }
+    }
+}

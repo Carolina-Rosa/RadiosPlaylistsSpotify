@@ -66,6 +66,13 @@ namespace SpotifyPlaylistRadio.Controllers
 
             return allTop5Songs;
         }
+        
+        [HttpGet("{radio}/{dateTime}")]
+        public async Task<MusicPlayed> GetWhatWasPlaying(string radio, DateTime dateTime)
+        {
+            var musicPlayed = await _musicSpotifyService.GetWhatWasPlaying(radio, dateTime);
+            return musicPlayed;
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateMusicSpotify(MusicSpotify newMusicSpotify)

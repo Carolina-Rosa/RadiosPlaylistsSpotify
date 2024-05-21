@@ -15,7 +15,7 @@ export default function Header() {
                         <Link to="/stats">Statistics</Link>
                     </li>
                     <li>
-                        <Link to="/something">Something else</Link>
+                        <Link to="/what-was-playing">What was playing?</Link>
                     </li>
                 </ul>
             </div>

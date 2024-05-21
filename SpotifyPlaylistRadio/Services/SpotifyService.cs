@@ -149,6 +149,23 @@ namespace SpotifyPlaylistRadio.Services
             }
             return null;
         }
+        
+        public async Task<MusicPlayed> GetMusicByID(string token, string ID)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage response = await _httpClient.GetAsync("https://api.spotify.com/v1/tracks/" + ID);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                MusicPlayed ms = JsonConvert.DeserializeObject<MusicPlayed>(jsonString);
+
+                return ms;
+            }
+            return null;
+        }
 
         public async Task<Playlist> AddToPlaylist(string token, string playlist_id, MusicSpotify music, string radioName)
         {
