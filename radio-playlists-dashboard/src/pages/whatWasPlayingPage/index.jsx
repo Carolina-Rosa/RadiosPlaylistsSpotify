@@ -37,6 +37,19 @@ export default function WhatWasPlayingPage() {
         setSelectedDateTime(e.currentTarget.value);
     };
 
+    const getArtistsInString = (artists) => {
+        if (artists.length === 1) {
+            return artists[0].name;
+        } else {
+            var artistsList = "";
+            for (var i = 0; i < artists.length - 1; i++) {
+                artistsList += artists[i].name + ", ";
+            }
+            artistsList += artists[artists.length - 1].name;
+            return artistsList;
+        }
+    };
+
     return (
         <div className="ww-playing-page">
             <h1 className="wwplaying-title">What was playing?</h1>
@@ -77,9 +90,7 @@ export default function WhatWasPlayingPage() {
                         {song ? (
                             <MusicThatPlayed
                                 songName={song.name}
-                                songArtist={song.artists?.map(
-                                    (artist) => artist.name + ", "
-                                )} /* -> fix this to display "," between artists - not on all iterations */
+                                songArtist={getArtistsInString(song.artists)}
                                 linkToSpotify={song.external_urls.spotify}
                                 image={song.album.images[0].url}
                             />

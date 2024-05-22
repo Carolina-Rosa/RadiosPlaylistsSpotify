@@ -16,7 +16,12 @@ export default function MusicThatPlayed({
             <div className="music-info">
                 <h2>{songName}</h2>
                 <p>{songArtist}</p>
-                <a className="button-to-spotify" href={linkToSpotify}>
+                <a
+                    className="button-to-spotify"
+                    href={linkToSpotify}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     Listen on Spotify
                 </a>
             </div>
