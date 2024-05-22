@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SpotifyPlaylistRadio.Models;
-using SpotifyPlaylistRadio.Models.ReadDataFromRadio;
 using SpotifyPlaylistRadio.Models.Top5;
 
 namespace SpotifyPlaylistRadio.Services
@@ -62,13 +61,25 @@ namespace SpotifyPlaylistRadio.Services
         
         public async Task<MusicPlayed> GetWhatWasPlaying(string radioName, DateTime dateTime)
         {
-            var allSongs = await _musicSpotifyCollection.Find(x => x.radioName == radioName && x.timestamp.CompareTo(dateTime.AddMinutes(-5))>0 && x.timestamp.CompareTo(dateTime.AddMinutes(2)) < 0).ToListAsync();
-            Console.WriteLine(allSongs);
+            var allSongs = await _musicSpotifyCollection.Find(x => x.radioName == radioName && x.timestamp.CompareTo(dateTime.AddMinutes(-5))>0 && x.timestamp.CompareTo(dateTime.AddMinutes(1)) < 0).ToListAsync();
+
             if (allSongs.Count == 0)
             {
                 return null;
             }
-             var musicPlayed = await _spotifyService.GetMusicByID(_authToken.access_token, allSongs[0].id);
+
+            var musicOnTime = new MusicSpotify();
+            var timeDif = new TimeSpan(1,0,0);
+            foreach(var song in allSongs)
+            {
+                if (dateTime.Subtract (song.timestamp) < timeDif)
+                {
+                    timeDif= dateTime.Subtract (song.timestamp);
+                    musicOnTime = song;
+                }
+            }
+
+            var musicPlayed = await _spotifyService.GetMusicByID(_authToken.access_token, musicOnTime.id);
 
             return musicPlayed;
         }
