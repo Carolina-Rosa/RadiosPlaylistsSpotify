@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import axios from "axios";
 
 import "./styles.scss";
@@ -71,11 +72,12 @@ export default function WhatWasPlayingPage() {
                         </label>
                         <label>
                             Date & time:
-                            <input
+                            {/* <input
                                 type="datetime-local"
                                 name="name"
                                 onChange={handleChangeDate}
-                            />
+                            /> */}
+                            <DateTimePicker />
                         </label>
                         <input
                             className="form-button"
