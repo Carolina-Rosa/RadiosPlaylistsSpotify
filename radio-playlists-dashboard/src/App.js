@@ -7,20 +7,25 @@ import StatsPage from "./pages/statsPage";
 import NoPage from "./pages/noPage";
 import WhatWasPlayingPage from "./pages/whatWasPlayingPage";
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 function App() {
     return (
         <>
-            <Header />
-            <Routes>
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="stats" element={<StatsPage />} />
-                <Route
-                    path="what-was-playing"
-                    element={<WhatWasPlayingPage />}
-                />
-                <Route path="*" element={<NoPage />} />
-            </Routes>
-            <Footer />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Header />
+                <Routes>
+                    <Route path="/" element={<DashboardPage />} />
+                    <Route path="stats" element={<StatsPage />} />
+                    <Route
+                        path="what-was-playing"
+                        element={<WhatWasPlayingPage />}
+                    />
+                    <Route path="*" element={<NoPage />} />
+                </Routes>
+                <Footer />
+            </LocalizationProvider>
         </>
     );
 }
