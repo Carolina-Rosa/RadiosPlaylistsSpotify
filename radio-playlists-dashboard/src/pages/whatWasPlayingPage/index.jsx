@@ -1,42 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import axios from "axios";
+import React, { useState } from "react";
 
 import "./styles.scss";
 import MusicThatPlayed from "../../Components/musicThatPlayed";
+import WWPlayingForm from "../../Components/WWPlayingForm";
 
 export default function WhatWasPlayingPage() {
-    const [radios, setRadios] = useState([]);
     const [song, setSong] = useState([]);
-    const [showMusicCard, setShowMusicCard] = useState(false);
-    const [selectedRadio, setSelectedRadio] = useState("Antena3");
-    const [selectedDateTime, setSelectedDateTime] = useState("");
-
-    useEffect(() => {
-        axios.get(`https://localhost:7270/api/radios/`).then((res) => {
-            setRadios(res.data);
-        });
-    }, []);
-
-    const getWhatWasPlaying = async (event) => {
-        event.preventDefault();
-        const res = await axios.get(
-            `https://localhost:7270/api/musicSpotify/${selectedRadio}/${selectedDateTime}:00.000+00:00`
-        );
-
-        setSong(res.data);
-        setShowMusicCard(true);
-    };
-
-    const handleSelectedRadioChange = (e) => {
-        console.log(selectedRadio);
-        setSelectedRadio(e.currentTarget.value);
-    };
-
-    const handleChangeDate = (e) => {
-        console.log(selectedDateTime);
-        setSelectedDateTime(e.currentTarget.value);
-    };
 
     const getArtistsInString = (artists) => {
         if (artists.length === 1) {
@@ -55,39 +24,10 @@ export default function WhatWasPlayingPage() {
         <div className="ww-playing-page">
             <h1 className="wwplaying-title">What was playing?</h1>
             <div className="ww-playing-body">
-                <div className="form-section">
-                    <form className="form-ww-playing">
-                        <label>
-                            Radio:
-                            <select
-                                value={selectedRadio}
-                                onChange={handleSelectedRadioChange}
-                            >
-                                {radios.map((radioObj, i) => (
-                                    <option key={i} value={radioObj.name}>
-                                        {radioObj.displayName}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        <label>
-                            Date & time:
-                            {/* <input
-                                type="datetime-local"
-                                name="name"
-                                onChange={handleChangeDate}
-                            /> */}
-                            <DateTimePicker />
-                        </label>
-                        <input
-                            className="form-button"
-                            type="submit"
-                            value="What was playing?"
-                            onClick={getWhatWasPlaying}
-                        />
-                    </form>
-                </div>
-                {showMusicCard ? (
+                <WWPlayingForm setSong={setSong} />
+                {song?.length === 0 ? (
+                    <div></div>
+                ) : (
                     <div className="show-music-section">
                         {song ? (
                             <MusicThatPlayed
@@ -100,8 +40,6 @@ export default function WhatWasPlayingPage() {
                             <p>No Music Playing</p>
                         )}
                     </div>
-                ) : (
-                    <div></div>
                 )}
             </div>
         </div>
