@@ -77,12 +77,12 @@ export default function WWPlayingForm({ setSong }) {
                         }}
                     />
                 </label>
-                {/*  <input
-                            className="form-button"
-                            type="submit"
-                            value="What was playing?"
-                            onClick={getWhatWasPlaying}
-                        /> */}
+                <input
+                    className="form-button"
+                    type="submit"
+                    value="What was playing?"
+                    onClick={getWhatWasPlaying}
+                />
             </form>
         </div>
     );
