@@ -10,7 +10,7 @@ namespace SpotifyPlaylistRadio.Services
         Task<Playlist> GetPlaylist(string token, string playlistId);
         Task RemoveTracksWhenPlaylistReachesMaxSize(string token, Playlist playlist, int playlistMaxSize, string radioName);
         Task<MusicSpotify> SearchMusicPlaying(string token, SongScraped song, string radioName);
-        Task<MusicPlayed> GetMusicByID(string token, string ID);
+        Task<MusicSpotify> GetMusicByID(string token, string ID);
         Task<Playlist> AddToPlaylist(string token, string playlist_id, MusicSpotify music, string radioName);
     }
 }

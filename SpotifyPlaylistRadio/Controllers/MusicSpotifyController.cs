@@ -68,7 +68,7 @@ namespace SpotifyPlaylistRadio.Controllers
         }
         
         [HttpGet("{radio}/{dateTime}")]
-        public async Task<MusicPlayed> GetWhatWasPlaying(string radio, DateTime dateTime)
+        public async Task<MusicSpotify> GetWhatWasPlaying(string radio, DateTime dateTime)
         {
             var musicPlayed = await _musicSpotifyService.GetWhatWasPlaying(radio, dateTime);
             return musicPlayed;

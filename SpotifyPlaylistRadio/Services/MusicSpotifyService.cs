@@ -59,7 +59,7 @@ namespace SpotifyPlaylistRadio.Services
             return topValues;
         }
         
-        public async Task<MusicPlayed> GetWhatWasPlaying(string radioName, DateTime dateTime)
+        public async Task<MusicSpotify> GetWhatWasPlaying(string radioName, DateTime dateTime)
         {
             var allSongs = await _musicSpotifyCollection.Find(x => x.radioName == radioName && x.timestamp.CompareTo(dateTime.AddMinutes(-5))>0 && x.timestamp.CompareTo(dateTime.AddMinutes(1)) < 0).ToListAsync();
 

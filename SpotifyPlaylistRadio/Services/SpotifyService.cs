@@ -150,7 +150,7 @@ namespace SpotifyPlaylistRadio.Services
             return null;
         }
         
-        public async Task<MusicPlayed> GetMusicByID(string token, string ID)
+        public async Task<MusicSpotify> GetMusicByID(string token, string ID)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -160,7 +160,7 @@ namespace SpotifyPlaylistRadio.Services
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                MusicPlayed ms = JsonConvert.DeserializeObject<MusicPlayed>(jsonString);
+                MusicSpotify ms = JsonConvert.DeserializeObject<MusicSpotify>(jsonString);
 
                 return ms;
             }
