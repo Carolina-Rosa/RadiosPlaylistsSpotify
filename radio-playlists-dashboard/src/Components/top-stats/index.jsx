@@ -22,6 +22,10 @@ export default function TopStats({ title, request }) {
     const [selectedTab, setSelectedTab] = useState(TimeRange.Last24Hours.id);
 
     useEffect(() => {
+        console.log(radiosTop);
+    }, [radiosTop]);
+
+    useEffect(() => {
         axios
             .get(`https://localhost:7270/api/${request}/top5/${selectedTab}`)
             .then((res) => {

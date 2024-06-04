@@ -5,6 +5,11 @@
     width: 300px;
     height: 100px;
 
+    .anchor-to-spotify {
+        cursor: pointer;
+        text-decoration: none;
+    }
+
     .position-number {
         margin: 0;
         color: $secondary-color;

@@ -14,6 +14,7 @@ export default function Top5({ title, content }) {
                         timesPlayed={artist.timesPlayed}
                         songName={artist.songName ?? artist.artistName}
                         songArtist={artist.songName ? artist.artistName : ""}
+                        linkToSpotify={artist.linkToSpotify}
                     />
                 ))}
             </div>
