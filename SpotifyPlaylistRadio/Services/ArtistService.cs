@@ -44,7 +44,7 @@ namespace SpotifyPlaylistRadio.Services
             {
                 TopArtist tA = artistTimesPlayed.Find(a => a.ArtistName == artist.name);
                 if (tA == null)
-                    artistTimesPlayed.Add(new TopArtist() { TimesPlayed = 1, ArtistName = artist.name });
+                    artistTimesPlayed.Add(new TopArtist() { TimesPlayed = 1, ArtistName = artist.name, LinkToSpotify = artist.external_urls.spotify });
                 else
                     tA.TimesPlayed += 1;
             }

@@ -4,6 +4,7 @@
     {
         public string SongName { get; set; }
         public string ArtistName { get; set; }
+        public string LinkToSpotify { get; set; }
         public int TimesPlayed { get; set; }
     }
 }

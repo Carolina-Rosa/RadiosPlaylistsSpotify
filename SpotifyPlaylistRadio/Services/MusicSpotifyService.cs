@@ -48,7 +48,7 @@ namespace SpotifyPlaylistRadio.Services
             {
                 TopSong tS = songsTimesPlayed.Find(s => s.SongName == song.name);
                 if (tS == null)
-                    songsTimesPlayed.Add(new TopSong() { TimesPlayed = 1, SongName = song.name, ArtistName = song.artists.Select(i => i.name).Aggregate((i, j) => i + ", " + j) });
+                    songsTimesPlayed.Add(new TopSong() { TimesPlayed = 1, SongName = song.name, ArtistName = song.artists.Select(i => i.name).Aggregate((i, j) => i + ", " + j), LinkToSpotify = song.external_urls.spotify});
                 else
                     tS.TimesPlayed += 1;
             }
@@ -59,7 +59,7 @@ namespace SpotifyPlaylistRadio.Services
             return topValues;
         }
         
-        public async Task<MusicPlayed> GetWhatWasPlaying(string radioName, DateTime dateTime)
+        public async Task<MusicSpotify> GetWhatWasPlaying(string radioName, DateTime dateTime)
         {
             var allSongs = await _musicSpotifyCollection.Find(x => x.radioName == radioName && x.timestamp.CompareTo(dateTime.AddMinutes(-5))>0 && x.timestamp.CompareTo(dateTime.AddMinutes(1)) < 0).ToListAsync();
 

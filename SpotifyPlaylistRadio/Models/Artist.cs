@@ -10,6 +10,7 @@ namespace SpotifyPlaylistRadio.Models
         public string _id { get; set; }
         public string id { get; set; }
         public string name { get; set; }
+        public ExternalURLs external_urls { get; set; }
         public string radioName { get; set; }
         public DateTime timestamp { get; set; }
 
