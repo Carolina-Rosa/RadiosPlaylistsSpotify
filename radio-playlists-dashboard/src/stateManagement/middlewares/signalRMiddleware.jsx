@@ -8,8 +8,7 @@ import {
     addRadios,
     addPlayingNowToExistingRadio
 } from "../playingNowMessage/playingNowMessageSlice";
-
-const WS_URL = "wss://localhost:7270/chatHub";
+import { WS_URL } from "../../api/socket/socket";
 
 const signalRMiddleware = (store) => {
     const newConnection = new HubConnectionBuilder()
