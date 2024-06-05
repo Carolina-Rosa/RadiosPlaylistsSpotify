@@ -1,1 +1,1 @@
-const URL = "ws://localhost:5067/webSocket";
+export const WS_URL = "wss://localhost:7270/chatHub";

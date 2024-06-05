@@ -197,6 +197,11 @@ namespace SpotifyPlaylistRadio.Services
         private static async Task<SongScraped> GetSongFromSite(Radio selectedRadio)
         {
             var data = await GetDataFromRadio(selectedRadio.url);
+
+            if (data == "")
+            {
+                return null;
+            }
             ReadDataFactory factory = new ReadDataFactory();
 
             IDataFromRadio dataFromRadio = factory.readDataFromRadio(selectedRadio.dataFormat);
@@ -207,9 +212,19 @@ namespace SpotifyPlaylistRadio.Services
         private static async Task<string> GetDataFromRadio(string url)
         {
             var client = new HttpClient();
+            var data="";
 
-            //TODO - try catch
-            return await client.GetStringAsync(url);
+            try
+            {
+                  data = await client.GetStringAsync(url);
+
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine("CAUGHT EXCEPTION:");
+                System.Diagnostics.Debug.WriteLine(exception);
+            }
+            return data;
         }
     }
 }
