@@ -17,7 +17,7 @@ namespace SpotifyPlaylistRadio.Services
             _authToken = authToken;
         }
 
-        public async Task<AuthToken> RefreshToken(string refreshToken, string clientId, string clientSecret)
+        public async Task RefreshToken(string refreshToken, string clientId, string clientSecret)
         {
             HttpRequestMessage req = new(HttpMethod.Post, "token");
             req.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")));
@@ -38,7 +38,7 @@ namespace SpotifyPlaylistRadio.Services
                 _authToken.token_type= tokenResponse.token_type;
                 _authToken.expires_in = tokenResponse.expires_in;
             }
-            return null;
+            
         }
     }
 }
