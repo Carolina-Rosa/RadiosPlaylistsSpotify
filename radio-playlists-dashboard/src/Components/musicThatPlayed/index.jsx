@@ -1,5 +1,6 @@
 import React from "react";
 import "./styles.scss";
+import AnchorButton from "../anchor-button";
 
 export default function MusicThatPlayed({
     songName,
@@ -16,14 +17,10 @@ export default function MusicThatPlayed({
             <div className="music-info">
                 <h2>{songName}</h2>
                 <p>{songArtist}</p>
-                <a
-                    className="button-to-spotify"
-                    href={linkToSpotify}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Listen on Spotify
-                </a>
+                <AnchorButton
+                    link={linkToSpotify}
+                    content="Listen on Spotify"
+                />
             </div>
         </div>
     );
