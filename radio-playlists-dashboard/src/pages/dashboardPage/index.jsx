@@ -4,6 +4,7 @@ import "./styles.scss";
 import TableLogs from "../../Components/tableLogs";
 import RadioSection from "../../Components/radiosSection";
 import Countdown from "../../Components/timer";
+import { Link } from "react-router-dom";
 
 export default function DashboardPage() {
     const logs = useSelector((state) => state.LogsMessage.logsList);
@@ -14,7 +15,13 @@ export default function DashboardPage() {
     return (
         <div className="dashboard-page">
             <div className="left-section">
-                <h1 className="logs-title">Logs - {radio} </h1>
+                <h1 className="logs-title">
+                    Logs -{" "}
+                    <Link className="logs-title" to={`/radioPage/${radio}`}>
+                        {" "}
+                        {radio}{" "}
+                    </Link>
+                </h1>
                 <TableLogs
                     logs={logs.find((log) => log.radio === radio)?.logsList}
                 />

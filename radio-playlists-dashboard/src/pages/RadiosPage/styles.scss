@@ -1,0 +1,45 @@
+@import "./../../utilities/variables.scss";
+
+.radios-page {
+    display: flex;
+    flex-direction: column;
+    background-color: $background-color;
+    min-height: 85vh;
+    padding: 0 150px 100px;
+
+    .radios-title {
+        color: $secondary-color;
+        font-size: 70px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .playlist-section {
+        margin: 20px 0;
+        background-color: $secondary-color;
+        padding: 30px;
+        display: inline-grid;
+        grid-template-columns: 3fr 2fr;
+        border-radius: 20px;
+
+        .playlist-info {
+            display: flex;
+            flex-direction: column;
+            color: $background-color;
+            justify-content: space-between;
+
+            .info-text {
+                margin: 0;
+            }
+        }
+
+        .playlist-image-section {
+            justify-self: center;
+            .playlist-image {
+                height: 500px;
+                width: 500px;
+                object-fit: cover;
+            }
+        }
+    }
+}

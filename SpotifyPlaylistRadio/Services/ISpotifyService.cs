@@ -4,7 +4,7 @@ namespace SpotifyPlaylistRadio.Services
 {
     public interface ISpotifyService
     {
-        Task<Playlists> GetUsersPlaylist(string token);
+        Task GetUsersPlaylist(string token);
         Task<string> GetCurrentUser(string token);
         Task<Playlist> CreatePlaylist(string token, Dictionary<string, string> playlistInfo);
         Task<Playlist> GetPlaylist(string token, string playlistId);

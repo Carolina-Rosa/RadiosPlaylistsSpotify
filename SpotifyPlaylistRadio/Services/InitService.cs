@@ -17,11 +17,12 @@ namespace SpotifyPlaylistRadio.Services
         private readonly RadiosService _radioService;
         private readonly IMessageWriter _messageWriter;
         private readonly AuthToken _authToken;
+        private readonly Playlists _playlists;
 
 
         public InitService(ISpotifyAccountService spotifyAccountService, ISpotifyService spotifyService, IConfiguration configuration, 
-            RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService, 
-            RadiosService radioService, IMessageWriter messageWriter, AuthToken authToken)
+            RadiosService radiosService, PlaylistService playlistService, MusicSpotifyService musicSpotifyService, ArtistService artistsService,
+            RadiosService radioService, IMessageWriter messageWriter, AuthToken authToken, Playlists playlists)
         {
             _spotifyAccountService = spotifyAccountService;
             _spotifyService = spotifyService;
@@ -33,6 +34,7 @@ namespace SpotifyPlaylistRadio.Services
             _radioService = radioService;
             _messageWriter = messageWriter;
             _authToken = authToken;
+            _playlists = playlists;
         }
 
         public async Task something()
@@ -46,14 +48,9 @@ namespace SpotifyPlaylistRadio.Services
             DateTime lastRefresh = DateTime.Now;
 
             var lastMusicPlayedOnRadio = radiosList.ToDictionary(keySelector: radio => radio.name, elementSelector: music => "");
-           
-            Playlists playlists = null;
+                       
+            await _spotifyService.GetUsersPlaylist(_authToken.access_token);
             
-            while (playlists == null)
-            {
-                playlists = await _spotifyService.GetUsersPlaylist(_authToken.access_token);
-            }
-
             while (true)
             {
                 foreach (Radio r in radiosList)
@@ -61,7 +58,7 @@ namespace SpotifyPlaylistRadio.Services
                     SongScraped scrapedSong = await GetSongFromSite(r);
                     if (scrapedSong != null)
                     {
-                        Playlist playlist = await GetPlaylist(playlists, _authToken.access_token, r.displayName);
+                        Playlist playlist = await GetPlaylist(_playlists, _authToken.access_token, r.displayName);
                         if (playlist != null)
                         {
                             if (NeedsNewRefresh(lastRefresh))
@@ -83,9 +80,9 @@ namespace SpotifyPlaylistRadio.Services
                                 {
                                     await _messageWriter.SendMessageSocket("Music " + scrapedSong.Title + " is playing on " + r.displayName, MessageType.Log, r.name);
 
-                                    await SearchAndAddSongToPlaylist(_authToken.access_token, scrapedSong, r.name, playlist.id);
+                                    await SearchAndAddSongToPlaylist(_authToken.access_token, scrapedSong, r.name, playlist.ID);
 
-                                    await RemoveTrackIfReachesMax(_authToken.access_token, r.name, playlist.id);
+                                    await RemoveTrackIfReachesMax(_authToken.access_token, r.name, playlist.ID);
                                 }
 
                             }
@@ -117,7 +114,7 @@ namespace SpotifyPlaylistRadio.Services
             return songTitle == lastMusicPlayedOnRadio;
         }
 
-        private async Task NewRefreshToken()
+        private async Task NewRefreshToken()  
         {
             await _spotifyAccountService.RefreshToken(_configuration["Spotify:RefreshToken"], _configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
         }
@@ -179,7 +176,7 @@ namespace SpotifyPlaylistRadio.Services
 
         private async Task<Playlist> GetPlaylist(Playlists playlists, string access_token, string selectedRadio)
         {
-            Playlist p = playlists.items.FirstOrDefault((item) => item.name == "Listening " + selectedRadio);
+            Playlist p = playlists.items.FirstOrDefault((item) => item.Name == "Listening " + selectedRadio);
             if (p == null)
             {
                 p = await _spotifyService.CreatePlaylist(access_token, new Dictionary<string, string> {

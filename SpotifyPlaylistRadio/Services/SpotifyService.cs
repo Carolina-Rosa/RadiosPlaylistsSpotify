@@ -12,15 +12,17 @@ namespace SpotifyPlaylistRadio.Services
         private readonly HttpClient _httpClient;
         private readonly ISearchHelperService _searchHelperService;
         private readonly IMessageWriter _messageWriter;
+        private readonly Playlists _playlists;
 
-        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, IMessageWriter messageWriter)
+        public SpotifyService(HttpClient httpClient, ISearchHelperService searchHelperService, IMessageWriter messageWriter, Playlists playlists)
         {
             _httpClient = httpClient;
             _searchHelperService = searchHelperService;
             _messageWriter = messageWriter;
+            _playlists = playlists;
         }
 
-        public async Task<Playlists> GetUsersPlaylist(string token)
+        public async Task GetUsersPlaylist(string token)
         {
             string user_id = await GetCurrentUser(token);
 
@@ -32,10 +34,11 @@ namespace SpotifyPlaylistRadio.Services
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<Playlists>(jsonString);
-            }
+                var playlists = JsonConvert.DeserializeObject<Playlists>(jsonString);
 
-            return null;
+                _playlists.items = playlists.items;
+                _playlists.total = playlists.total;
+            }
         }
 
         public async Task<string> GetCurrentUser(string token)
@@ -98,7 +101,7 @@ namespace SpotifyPlaylistRadio.Services
             int limit = playlist.Tracks.total - playlistMaxSize;
 
             HttpResponseMessage response = await _httpClient.GetAsync(
-                "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks?limit=" + limit + "&offset=" + playlistMaxSize);
+                "https://api.spotify.com/v1/playlists/" + playlist.ID + "/tracks?limit=" + limit + "&offset=" + playlistMaxSize);
 
             if (response.IsSuccessStatusCode)
             {
@@ -106,9 +109,9 @@ namespace SpotifyPlaylistRadio.Services
                 var playlistOfItemsToRemove = JsonConvert.DeserializeObject<TracksFromPlaylist>(jsonString);
                 foreach (TrackFromPlaylist t in playlistOfItemsToRemove.items)
                 {
-                    await DeleteSongFromPlaylist(token, playlist.id, t.track.uri);
+                    await DeleteSongFromPlaylist(token, playlist.ID, t.track.uri);
 
-                    await _messageWriter.SendMessageSocket("Playlist " + playlist.name + " reached Max Size. Remove song " + t.track.name, MessageType.Log, radioName );
+                    await _messageWriter.SendMessageSocket("Playlist " + playlist.Name + " reached Max Size. Remove song " + t.track.name, MessageType.Log, radioName );
 
                     //TODO - Send log  - playlist X reached Max Size remove song y
                 }

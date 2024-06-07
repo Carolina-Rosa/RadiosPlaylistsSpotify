@@ -17,6 +17,10 @@
             font-size: 70px;
             text-transform: uppercase;
             margin: 0;
+            text-decoration: none;
+            & a:hover {
+                color: $base-color;
+            }
         }
     }
 
