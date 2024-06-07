@@ -1,0 +1,25 @@
+@import "./../../utilities/variables.scss";
+
+.anchor-button {
+    background-color: $secondary-color;
+    border: 0;
+    border-radius: 20px;
+    width: 50%;
+    padding: 15px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 18px;
+    color: $white;
+
+    &.green-button {
+        background-color: $primary-color;
+        color: $background-color;
+
+        &:hover {
+            color: $white;
+        }
+    }
+    &:hover {
+        background-color: $base-color;
+    }
+}
