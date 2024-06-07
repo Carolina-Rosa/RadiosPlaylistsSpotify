@@ -2,7 +2,7 @@
 {
     public class Playlists
     {
-        int total;
+        public int total;
         public List<Playlist> items;
     }
 }

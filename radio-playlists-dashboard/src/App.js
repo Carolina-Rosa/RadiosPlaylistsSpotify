@@ -9,6 +9,7 @@ import WhatWasPlayingPage from "./pages/whatWasPlayingPage";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import RadiosPage from "./pages/RadiosPage";
 
 function App() {
     return (
@@ -17,6 +18,11 @@ function App() {
                 <Header />
                 <Routes>
                     <Route path="/" element={<DashboardPage />} />
+                    <Route
+                        exact
+                        path="radioPage/:name"
+                        element={<RadiosPage />}
+                    />
                     <Route path="stats" element={<StatsPage />} />
                     <Route
                         path="what-was-playing"

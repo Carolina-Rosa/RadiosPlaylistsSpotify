@@ -25,6 +25,9 @@ namespace SpotifyPlaylistRadio.Services
 
         public async Task<Radio?> GetAsync(string id) =>
             await _radiosCollection.Find(x => x.id == id).FirstOrDefaultAsync();
+        
+        public async Task<Radio?> GetByNameAsync(string radioName) =>
+            await _radiosCollection.Find(x => x.name == radioName).FirstOrDefaultAsync();
 
         public async Task CreateAsync(Radio newRadio) =>
             await _radiosCollection.InsertOneAsync(newRadio);
